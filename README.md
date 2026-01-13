@@ -15,7 +15,7 @@ npm i soundretouch-api
 ```ts
 import { SoundTouchDevice } from 'soundretouch-api'
 
-const device = new SoundTouchDevice('192.168.1.37')
+const device = new SoundTouchDevice('192.168.1.67')
 
 const info = await device.info()
 const nowPlaying = await device.nowPlaying()
