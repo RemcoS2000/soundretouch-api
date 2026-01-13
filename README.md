@@ -7,3 +7,7 @@ SoundRetouched provides a clean TypeScript API to discover and manage Bose Sound
 ## Getting Started
 
 TODO
+
+## Docs
+
+- `docs/SoundTouch-Web-API.pdf`

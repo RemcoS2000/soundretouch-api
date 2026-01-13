@@ -1,22 +1,47 @@
-﻿import { HttpClient } from '../client/http';
+﻿import { HttpClient } from '../client/http'
 
-export type SoundTouchKey =
-    | 'PLAY'
-    | 'PAUSE'
-    | 'NEXT_TRACK'
-    | 'PREV_TRACK'
-    | 'MUTE'
-    | 'POWER'
-    | 'SHUFFLE_ON'
-    | 'SHUFFLE_OFF'
-    | 'REPEAT_ALL'
-    | 'REPEAT_OFF'
-    | 'THUMBS_UP'
-    | 'THUMBS_DOWN';
+import { KeyState, KeyValue } from '../types/Enums'
 
-export type KeyPressState = 'press' | 'release';
+export type SoundTouchKey = KeyValue
 
-export async function sendKeyPress(client: HttpClient, key: SoundTouchKey, state: KeyPressState = 'press'): Promise<void> {
-    const body = `<key state="${state}" sender="soundretouch-api">${key}</key>`;
-    await client.post('/key', body);
+export type KeyPressState = KeyState
+
+/**
+ * Sends a remote button press or release to the device.
+ *
+ * POST /key
+ *
+ * Keys are used as a simple means to interact with the SoundTouch speaker.
+ * For a full listing of supported keys see "KEY VALUE" in section 4.1 of the API docs.
+ * It is good practice to send a "press" followed by a "release" to simulate a full key click.
+ *
+ * @param key Key value to send.
+ * @param state Key state to send: "press" or "release".
+ * @param sender Sender label to include in the request.
+ * @returns A promise that resolves when the device accepts the key event.
+ *
+ * @example
+ * await sendKeyPress(client, 'PLAY', 'press', 'Gabbo')
+ * await sendKeyPress(client, 'PLAY', 'release', 'Gabbo')
+ */
+export async function sendKeyPress(client: HttpClient, key: SoundTouchKey, state: KeyPressState = 'press', sender = 'soundretouch-api'): Promise<void> {
+    const body = `<key state="${state}" sender="${sender}">${key}</key>`
+    await client.post('/key', body)
+}
+
+/**
+ * Sends a press then release sequence for a key.
+ *
+ * POST /key
+ *
+ * @param key Key value to send.
+ * @param sender Sender label to include in the request.
+ * @returns A promise that resolves when the device accepts both key events.
+ *
+ * @example
+ * await sendKeyTap(client, 'PLAY', 'Gabbo')
+ */
+export async function sendKeyTap(client: HttpClient, key: SoundTouchKey, sender = 'soundretouch-api'): Promise<void> {
+    await sendKeyPress(client, key, 'press', sender)
+    await sendKeyPress(client, key, 'release', sender)
 }

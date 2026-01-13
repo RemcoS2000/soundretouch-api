@@ -1,18 +1,18 @@
 import { HttpClient } from '../client/http'
 import { NowPlaying } from '../types/NowPlaying'
 
-type NowPlayingResponse = {
+type TrackInfoResponse = {
     nowPlaying?: NowPlaying
 }
 
 /**
- * Gets info about the currently playing media.
+ * Gets track information for the currently playing media.
  *
- * GET /now_playing
+ * GET /trackInfo
  *
  * @returns Promise<NowPlaying> A promise that resolves to the now playing payload as returned by the device.
  */
-export async function fetchNowPlaying(client: HttpClient): Promise<NowPlaying> {
-    const data = await client.getXml<NowPlayingResponse>('/now_playing')
+export async function fetchTrackInfo(client: HttpClient): Promise<NowPlaying> {
+    const data = await client.getXml<TrackInfoResponse>('/trackInfo')
     return data.nowPlaying ?? {}
 }

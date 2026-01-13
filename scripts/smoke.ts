@@ -1,27 +1,29 @@
-import { discoverSoundTouchDevices, DiscoveryResult } from '../src/discovery/discoverSoundTouchDevices';
+import { SoundTouchDiscovery } from '../src/discovery/SoundTouchDiscovery'
 
-import { SoundTouchDevice } from '../src/device/SoundTouchDevice';
-
+/**
+ * Smoke test script to discover SoundTouch devices and fetch their info and volume.
+ */
 async function run() {
-    const discoveryResults: DiscoveryResult[] = await discoverSoundTouchDevices();
+    const handle = SoundTouchDiscovery.start(async (device) => {
+        console.log(`✅ Found SoundTouch device at ${device.host}`)
 
-    for (const result of discoveryResults) {
-        console.log(`Found SoundTouch device at ${result.host}:${result.port ?? 'default port'}`);
+        const info = await device.info()
+        console.log('ℹ️ Device Info:', info)
 
-        const device: SoundTouchDevice = new SoundTouchDevice(result.host);
+        const volume = await device.volume()
+        console.log('🔊 Current Volume:', volume)
 
-        const info = await device.info();
-        console.log(`  Device Info: ${info.model} - ${info.deviceName}`);
+        const nowPlaying = await device.nowPlaying()
+        console.log('🎵 Now Playing:', nowPlaying)
+    })
 
-        const nowPlaying = await device.nowPlaying();
-        console.log(`  Now Playing: ${nowPlaying.track} by ${nowPlaying.artist}`);
-
-        const volume = await device.volume();
-        console.log(`  Volume: ${volume.actual} (muted: ${volume.muted})`);
-    }
+    setTimeout(() => {
+        handle.stop()
+        console.log('🛑 Discovery stopped.')
+    }, 120000)
 }
 
 run().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-});
+    console.error(error)
+    process.exitCode = 1
+})

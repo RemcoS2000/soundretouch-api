@@ -1,9 +1,18 @@
-export { SoundTouchDevice } from './src/device/SoundTouchDevice';
-export { discoverSoundTouchDevices } from './src/discovery/discoverSoundTouchDevices';
-export type { DeviceInfo } from './src/models/DeviceInfo';
-export type { NowPlaying } from './src/models/NowPlaying';
-export type { VolumeState } from './src/models/VolumeState';
-export type { SoundTouchKey } from './src/endpoints/key';
-export type { DiscoveryResult, DiscoveryOptions } from './src/discovery/discoverSoundTouchDevices';
-export type { HttpClientOptions } from './src/client/http';
-export { SoundTouchError, HttpError, TimeoutError } from './src/client/errors';
+export { SoundTouchDevice } from './src/device/SoundTouchDevice'
+export type { DeviceInfo, DeviceInfoComponent, DeviceNetworkInfo } from './src/types/DeviceInfo'
+export type { Bass } from './src/types/Bass'
+export type { BassCapabilities } from './src/types/BassCapabilities'
+export type { Capabilities, Capability } from './src/types/Capabilities'
+export type { AudioDspControls } from './src/types/AudioDspControls'
+export type { ArtStatus, AudioMode, KeyState, KeyValue, PlayStatus, PresetId, SourceStatus } from './src/types/Enums'
+export type { AudioProductToneControls, AudioProductToneControlsUpdate, ToneControl } from './src/types/AudioProductToneControls'
+export type { AudioProductLevelControls, AudioProductLevelControlsUpdate, LevelControl } from './src/types/AudioProductLevelControls'
+export type { NowPlaying } from './src/types/NowPlaying'
+export type { Presets, Preset, PresetContentItem } from './src/types/Presets'
+export type { Zone, ZoneMember, ZoneConfig, ZoneConfigMember, ZoneSlaveConfig } from './src/types/Zone'
+export type { ContentItem } from './src/types/ContentItem'
+export type { Sources, SourceItem } from './src/types/Sources'
+export type { Volume } from './src/types/Volume'
+export type { SoundTouchKey } from './src/endpoints/key'
+export type { HttpClientOptions } from './src/client/http'
+export { SoundTouchError, HttpError, TimeoutError } from './src/client/errors'

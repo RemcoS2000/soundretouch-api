@@ -1,4 +1,4 @@
-﻿import { XMLParser } from 'fast-xml-parser';
+﻿import { XMLParser } from 'fast-xml-parser'
 
 const parser = new XMLParser({
     ignoreAttributes: false,
@@ -6,8 +6,8 @@ const parser = new XMLParser({
     parseAttributeValue: true,
     parseTagValue: true,
     trimValues: true,
-});
+})
 
 export function parseXml<T>(xml: string): T {
-    return parser.parse(xml) as T;
+    return parser.parse(xml) as T
 }
