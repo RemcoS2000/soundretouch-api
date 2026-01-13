@@ -1,4 +1,4 @@
-# SoundRetouched
+# SoundRetouch-API
 
 This is another unofficial TypeScript API library to configure and manage legacy Bose SoundTouch devices.
 
