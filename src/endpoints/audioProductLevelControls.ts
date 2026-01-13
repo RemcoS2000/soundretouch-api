@@ -1,20 +1,12 @@
+import createDebug from 'debug'
+
 import { HttpClient } from '../client/http'
 import { AudioProductLevelControls, AudioProductLevelControlsUpdate } from '../types/AudioProductLevelControls'
 
+const log = createDebug('soundretouch:endpoints:audioproductlevelcontrols')
+
 type AudioProductLevelControlsResponse = {
     audioproductlevelcontrols?: AudioProductLevelControls
-}
-
-/**
- * Gets the current front-center and rear-surround level settings from the device.
- *
- * GET /audioproductlevelcontrols
- *
- * @returns Promise<AudioProductLevelControls> A promise that resolves to the level controls payload as returned by the device.
- */
-export async function fetchAudioProductLevelControls(client: HttpClient): Promise<AudioProductLevelControls> {
-    const data = await client.getXml<AudioProductLevelControlsResponse>('/audioproductlevelcontrols')
-    return data.audioproductlevelcontrols ?? {}
 }
 
 function buildAudioProductLevelControlsXml(values: AudioProductLevelControlsUpdate): string {
@@ -32,6 +24,22 @@ function buildAudioProductLevelControlsXml(values: AudioProductLevelControlsUpda
 }
 
 /**
+ * Gets the current front-center and rear-surround level settings from the device.
+ *
+ * GET /audioproductlevelcontrols
+ *
+ * @returns Promise<AudioProductLevelControls> A promise that resolves to the level controls payload as returned by the device.
+ */
+export async function fetchAudioProductLevelControls(client: HttpClient): Promise<AudioProductLevelControls> {
+    log('GET /audioproductlevelcontrols')
+
+    const data = await client.getXml<AudioProductLevelControlsResponse>('/audioproductlevelcontrols')
+    log('response %O', data.audioproductlevelcontrols ?? {})
+
+    return data.audioproductlevelcontrols ?? {}
+}
+
+/**
  * Updates front-center and/or rear-surround levels for the device. Only included values are changed.
  *
  * POST /audioproductlevelcontrols
@@ -45,5 +53,9 @@ function buildAudioProductLevelControlsXml(values: AudioProductLevelControlsUpda
  */
 export async function setAudioProductLevelControls(client: HttpClient, values: AudioProductLevelControlsUpdate): Promise<void> {
     const body = buildAudioProductLevelControlsXml(values)
+
+    log('POST /audioproductlevelcontrols')
+    log('payload %s', body)
+
     await client.post('/audioproductlevelcontrols', body)
 }

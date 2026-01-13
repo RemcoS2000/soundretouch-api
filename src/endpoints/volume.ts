@@ -1,12 +1,20 @@
+import createDebug from 'debug'
+
 import { HttpClient } from '../client/http'
 import { Volume } from '../types/Volume'
+
+const log = createDebug('soundretouch:endpoints:volume')
 
 type VolumeResponse = {
     volume?: Volume
 }
 
 export async function fetchVolume(client: HttpClient): Promise<Volume> {
+    log('GET /volume')
+
     const data = await client.getXml<VolumeResponse>('/volume')
+    log('response %O', data.volume ?? {})
+
     return data.volume ?? {}
 }
 
@@ -30,5 +38,9 @@ export async function setVolume(client: HttpClient, value: number, muteenabled?:
     const normalized = Math.max(0, Math.min(100, Math.round(value)))
     const muteXml = typeof muteenabled === 'boolean' ? `<muteenabled>${muteenabled}</muteenabled>` : ''
     const body = `<volume>${normalized}${muteXml}</volume>`
+
+    log('POST /volume')
+    log('payload %s', body)
+
     await client.post('/volume', body)
 }

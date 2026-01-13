@@ -7,5 +7,10 @@
     "trailingComma": "es5",
     "bracketSpacing": true,
     "jsxBracketSameLine": false,
-    "arrowParens": "always"
+    "arrowParens": "always",
+    "plugins": ["prettier-plugin-packagejson", "@trivago/prettier-plugin-sort-imports"],
+    "importOrder": ["^\\u0000", "^node:", "^[a-zA-Z]", "^@/", "^\\.\\.(?!/?$)", "^\\.\\./?$", "^\\./"],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true,
+    "importOrderCaseInsensitive": true
 }

@@ -63,10 +63,13 @@ setTimeout(() => handle.stop(), 120000)
 
 ## Debug Logging
 
-This library supports debug output using:
+Enable debug output with the `DEBUG` environment variable. You can target all logs or narrow it down to a single subsystem.
 
 ```
 DEBUG=soundretouch:*
+DEBUG=soundretouch:discovery
+DEBUG=soundretouch:endpoints:*
+DEBUG=soundretouch:endpoints:info
 ```
 
 ## Smoke Test

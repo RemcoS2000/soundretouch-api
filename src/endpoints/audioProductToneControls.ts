@@ -1,20 +1,12 @@
+import createDebug from 'debug'
+
 import { HttpClient } from '../client/http'
 import { AudioProductToneControls, AudioProductToneControlsUpdate } from '../types/AudioProductToneControls'
 
+const log = createDebug('soundretouch:endpoints:audioproducttonecontrols')
+
 type AudioProductToneControlsResponse = {
     audioproducttonecontrols?: AudioProductToneControls
-}
-
-/**
- * Gets the current bass and treble settings from the device.
- *
- * GET /audioproducttonecontrols
- *
- * @returns Promise<AudioProductToneControls> A promise that resolves to the tone controls payload as returned by the device.
- */
-export async function fetchAudioProductToneControls(client: HttpClient): Promise<AudioProductToneControls> {
-    const data = await client.getXml<AudioProductToneControlsResponse>('/audioproducttonecontrols')
-    return data.audioproducttonecontrols ?? {}
 }
 
 function buildAudioProductToneControlsXml(values: AudioProductToneControlsUpdate): string {
@@ -32,6 +24,22 @@ function buildAudioProductToneControlsXml(values: AudioProductToneControlsUpdate
 }
 
 /**
+ * Gets the current bass and treble settings from the device.
+ *
+ * GET /audioproducttonecontrols
+ *
+ * @returns Promise<AudioProductToneControls> A promise that resolves to the tone controls payload as returned by the device.
+ */
+export async function fetchAudioProductToneControls(client: HttpClient): Promise<AudioProductToneControls> {
+    log('GET /audioproducttonecontrols')
+
+    const data = await client.getXml<AudioProductToneControlsResponse>('/audioproducttonecontrols')
+    log('response %O', data.audioproducttonecontrols ?? {})
+
+    return data.audioproducttonecontrols ?? {}
+}
+
+/**
  * Updates bass and/or treble settings for the device. Only included values are changed.
  *
  * POST /audioproducttonecontrols
@@ -45,5 +53,9 @@ function buildAudioProductToneControlsXml(values: AudioProductToneControlsUpdate
  */
 export async function setAudioProductToneControls(client: HttpClient, values: AudioProductToneControlsUpdate): Promise<void> {
     const body = buildAudioProductToneControlsXml(values)
+
+    log('POST /audioproducttonecontrols')
+    log('payload %s', body)
+
     await client.post('/audioproducttonecontrols', body)
 }

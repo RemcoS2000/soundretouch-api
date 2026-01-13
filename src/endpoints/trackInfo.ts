@@ -1,5 +1,9 @@
+import createDebug from 'debug'
+
 import { HttpClient } from '../client/http'
 import { NowPlaying } from '../types/NowPlaying'
+
+const log = createDebug('soundretouch:endpoints:trackinfo')
 
 type TrackInfoResponse = {
     nowPlaying?: NowPlaying
@@ -13,6 +17,9 @@ type TrackInfoResponse = {
  * @returns Promise<NowPlaying> A promise that resolves to the now playing payload as returned by the device.
  */
 export async function fetchTrackInfo(client: HttpClient): Promise<NowPlaying> {
+    log('GET /trackInfo')
+
     const data = await client.getXml<TrackInfoResponse>('/trackInfo')
+    log('response %O', data.nowPlaying ?? {})
     return data.nowPlaying ?? {}
 }

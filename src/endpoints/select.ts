@@ -1,5 +1,9 @@
+import createDebug from 'debug'
+
 import { HttpClient } from '../client/http'
 import { ContentItem } from '../types/ContentItem'
+
+const log = createDebug('soundretouch:endpoints:select')
 
 function escapeXml(value: string): string {
     return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
@@ -29,5 +33,8 @@ function buildContentItemXml(item: ContentItem): string {
  */
 export async function selectSource(client: HttpClient, item: ContentItem): Promise<void> {
     const body = buildContentItemXml(item)
+    log('POST /select')
+    log('payload %s', body)
+
     await client.post('/select', body)
 }

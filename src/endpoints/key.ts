@@ -1,9 +1,11 @@
-﻿import { HttpClient } from '../client/http'
+import createDebug from 'debug'
 
+import { HttpClient } from '../client/http'
 import { KeyState, KeyValue } from '../types/Enums'
 
-export type SoundTouchKey = KeyValue
+const log = createDebug('soundretouch:endpoints:key')
 
+export type SoundTouchKey = KeyValue
 export type KeyPressState = KeyState
 
 /**
@@ -26,6 +28,10 @@ export type KeyPressState = KeyState
  */
 export async function sendKeyPress(client: HttpClient, key: SoundTouchKey, state: KeyPressState = 'press', sender = 'soundretouch-api'): Promise<void> {
     const body = `<key state="${state}" sender="${sender}">${key}</key>`
+
+    log('POST /key')
+    log('payload %s', body)
+
     await client.post('/key', body)
 }
 
@@ -42,6 +48,9 @@ export async function sendKeyPress(client: HttpClient, key: SoundTouchKey, state
  * await sendKeyTap(client, 'PLAY', 'Gabbo')
  */
 export async function sendKeyTap(client: HttpClient, key: SoundTouchKey, sender = 'soundretouch-api'): Promise<void> {
+    log('POST /key (press)')
     await sendKeyPress(client, key, 'press', sender)
+
+    log('POST /key (release)')
     await sendKeyPress(client, key, 'release', sender)
 }

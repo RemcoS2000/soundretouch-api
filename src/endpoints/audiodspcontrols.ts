@@ -1,20 +1,12 @@
+import createDebug from 'debug'
+
 import { HttpClient } from '../client/http'
 import { AudioDspControls } from '../types/AudioDspControls'
 
+const log = createDebug('soundretouch:endpoints:audiodspcontrols')
+
 type AudioDspControlsResponse = {
     audiodspcontrols?: AudioDspControls
-}
-
-/**
- * Gets the current DSP settings for the device.
- *
- * GET /audiodspcontrols
- *
- * @returns Promise<AudioDspControls> A promise that resolves to the DSP controls payload as returned by the device.
- */
-export async function fetchAudioDspControls(client: HttpClient): Promise<AudioDspControls> {
-    const data = await client.getXml<AudioDspControlsResponse>('/audiodspcontrols')
-    return data.audiodspcontrols ?? {}
 }
 
 function buildAudioDspControlsXml(values: AudioDspControls): string {
@@ -32,6 +24,22 @@ function buildAudioDspControlsXml(values: AudioDspControls): string {
 }
 
 /**
+ * Gets the current DSP settings for the device.
+ *
+ * GET /audiodspcontrols
+ *
+ * @returns Promise<AudioDspControls> A promise that resolves to the DSP controls payload as returned by the device.
+ */
+export async function fetchAudioDspControls(client: HttpClient): Promise<AudioDspControls> {
+    log('GET /audiodspcontrols')
+
+    const data = await client.getXml<AudioDspControlsResponse>('/audiodspcontrols')
+    log('response %O', data.audiodspcontrols ?? {})
+
+    return data.audiodspcontrols ?? {}
+}
+
+/**
  * Updates DSP settings for the device. Only included values are changed.
  *
  * POST /audiodspcontrols
@@ -45,5 +53,9 @@ function buildAudioDspControlsXml(values: AudioDspControls): string {
  */
 export async function setAudioDspControls(client: HttpClient, values: AudioDspControls): Promise<void> {
     const body = buildAudioDspControlsXml(values)
+
+    log('POST /audiodspcontrols')
+    log('payload %s', body)
+
     await client.post('/audiodspcontrols', body)
 }

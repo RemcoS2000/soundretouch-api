@@ -1,33 +1,33 @@
 ﻿import { HttpClient, HttpClientOptions } from '../client/http'
-import { DeviceInfo } from '../types/DeviceInfo'
-import { NowPlaying } from '../types/NowPlaying'
-import { Sources } from '../types/Sources'
-import { Volume } from '../types/Volume'
-import { Bass } from '../types/Bass'
-import { BassCapabilities } from '../types/BassCapabilities'
-import { Capabilities } from '../types/Capabilities'
-import { AudioDspControls } from '../types/AudioDspControls'
-import { AudioProductToneControls, AudioProductToneControlsUpdate } from '../types/AudioProductToneControls'
-import { AudioProductLevelControls, AudioProductLevelControlsUpdate } from '../types/AudioProductLevelControls'
-import { Presets } from '../types/Presets'
-import { Zone, ZoneConfig, ZoneSlaveConfig } from '../types/Zone'
-import { fetchInfo } from '../endpoints/info'
-import { fetchNowPlaying } from '../endpoints/nowPlaying'
-import { fetchTrackInfo } from '../endpoints/trackInfo'
-import { fetchSources } from '../endpoints/sources'
-import { selectSource } from '../endpoints/select'
-import { setName } from '../endpoints/name'
-import { fetchVolume, setVolume } from '../endpoints/volume'
+import { fetchAudioDspControls, setAudioDspControls } from '../endpoints/audiodspcontrols'
+import { fetchAudioProductLevelControls, setAudioProductLevelControls } from '../endpoints/audioProductLevelControls'
+import { fetchAudioProductToneControls, setAudioProductToneControls } from '../endpoints/audioProductToneControls'
 import { fetchBass, setBass } from '../endpoints/bass'
 import { fetchBassCapabilities } from '../endpoints/bassCapabilities'
 import { fetchCapabilities } from '../endpoints/capabilities'
-import { fetchAudioDspControls, setAudioDspControls } from '../endpoints/audiodspcontrols'
-import { fetchAudioProductToneControls, setAudioProductToneControls } from '../endpoints/audioProductToneControls'
-import { fetchAudioProductLevelControls, setAudioProductLevelControls } from '../endpoints/audioProductLevelControls'
-import { fetchPresets } from '../endpoints/presets'
-import { addZoneSlave, fetchZone, removeZoneSlave, setZone } from '../endpoints/zone'
+import { fetchInfo } from '../endpoints/info'
 import { sendKeyPress, sendKeyTap, SoundTouchKey } from '../endpoints/key'
+import { setName } from '../endpoints/name'
+import { fetchNowPlaying } from '../endpoints/nowPlaying'
+import { fetchPresets } from '../endpoints/presets'
+import { selectSource } from '../endpoints/select'
+import { fetchSources } from '../endpoints/sources'
+import { fetchTrackInfo } from '../endpoints/trackInfo'
+import { fetchVolume, setVolume } from '../endpoints/volume'
+import { addZoneSlave, fetchZone, removeZoneSlave, setZone } from '../endpoints/zone'
+import { AudioDspControls } from '../types/AudioDspControls'
+import { AudioProductLevelControls, AudioProductLevelControlsUpdate } from '../types/AudioProductLevelControls'
+import { AudioProductToneControls, AudioProductToneControlsUpdate } from '../types/AudioProductToneControls'
+import { Bass } from '../types/Bass'
+import { BassCapabilities } from '../types/BassCapabilities'
+import { Capabilities } from '../types/Capabilities'
 import { ContentItem } from '../types/ContentItem'
+import { DeviceInfo } from '../types/DeviceInfo'
+import { NowPlaying } from '../types/NowPlaying'
+import { Presets } from '../types/Presets'
+import { Sources } from '../types/Sources'
+import { Volume } from '../types/Volume'
+import { Zone, ZoneConfig, ZoneSlaveConfig } from '../types/Zone'
 
 /**
  * Represents a SoundTouch device and provides methods to interact with it.
@@ -48,6 +48,13 @@ export class SoundTouchDevice {
         this.client = new HttpClient(host, options)
     }
 
+    /**
+     * Gets device information including identifiers, components, and network info.
+     *
+     * GET /info
+     *
+     * @returns Promise<DeviceInfo> A promise that resolves to the device info payload as returned by the device.
+     */
     info(): Promise<DeviceInfo> {
         return fetchInfo(this.client)
     }
@@ -364,21 +371,5 @@ export class SoundTouchDevice {
      */
     keyTap(key: SoundTouchKey, sender?: string): Promise<void> {
         return sendKeyTap(this.client, key, sender)
-    }
-
-    play(): Promise<void> {
-        return this.keyTap('PLAY')
-    }
-
-    pause(): Promise<void> {
-        return this.keyTap('PAUSE')
-    }
-
-    next(): Promise<void> {
-        return this.keyTap('NEXT_TRACK')
-    }
-
-    previous(): Promise<void> {
-        return this.keyTap('PREV_TRACK')
     }
 }

@@ -1,5 +1,9 @@
+import createDebug from 'debug'
+
 import { HttpClient } from '../client/http'
 import { Bass } from '../types/Bass'
+
+const log = createDebug('soundretouch:endpoints:bass')
 
 type BassResponse = {
     bass?: Bass
@@ -13,7 +17,11 @@ type BassResponse = {
  * @returns Promise<Bass> A promise that resolves to the bass payload as returned by the device.
  */
 export async function fetchBass(client: HttpClient): Promise<Bass> {
+    log('GET /bass')
+
     const data = await client.getXml<BassResponse>('/bass')
+    log('response %O', data.bass ?? {})
+
     return data.bass ?? {}
 }
 
@@ -30,5 +38,9 @@ export async function fetchBass(client: HttpClient): Promise<Bass> {
  */
 export async function setBass(client: HttpClient, value: number): Promise<void> {
     const body = `<bass>${value}</bass>`
+
+    log('POST /bass')
+    log('payload %s', body)
+
     await client.post('/bass', body)
 }
