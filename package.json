@@ -8,7 +8,8 @@
         "format": "prettier --write .",
         "lint": "eslint . --ext .ts",
         "prepare": "husky",
-        "start": "tsx index.ts"
+        "start": "tsx index.ts",
+        "test": "vitest"
     },
     "lint-staged": {
         "*.{ts,tsx,js,jsx}": [
@@ -41,6 +42,7 @@
         "prettier-plugin-packagejson": "^2.5.21",
         "tsx": "^4.21.0",
         "typescript": "5.9.3",
-        "typescript-eslint": "^8.53.0"
+        "typescript-eslint": "^8.53.0",
+        "vitest": "^2.1.8"
     }
 }
