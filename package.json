@@ -1,13 +1,49 @@
 {
     "name": "soundretouch-api",
-    "version": "0.1.0",
-    "private": true,
+    "version": "1.0.0",
+    "keywords": [
+        "bose",
+        "soundtouch",
+        "soundtouch-api",
+        "speaker",
+        "audio",
+        "web-api",
+        "websocket",
+        "mdns",
+        "bonjour"
+    ],
+    "homepage": "https://github.com/RemcoS2000/soundretouch-api/",
+    "bugs": {
+        "url": "https://github.com/RemcoS2000/soundretouch-api/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/RemcoS2000/soundretouch-api.git"
+    },
+    "license": "MIT",
     "type": "module",
-    "main": "index.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "docs",
+        "README.md"
+    ],
     "scripts": {
+        "build": "tsc -p tsconfig.build.json",
+        "clean": "rimraf dist",
         "format": "prettier --write .",
         "lint": "eslint . --ext .ts",
         "prepare": "husky",
+        "prepublishOnly": "npm run build",
         "start": "tsx index.ts",
         "test": "vitest"
     },
@@ -40,9 +76,10 @@
         "lint-staged": "^16.2.7",
         "prettier": "^3.7.4",
         "prettier-plugin-packagejson": "^2.5.21",
+        "rimraf": "^6.0.1",
         "tsx": "^4.21.0",
         "typescript": "5.9.3",
         "typescript-eslint": "^8.53.0",
-        "vitest": "^2.1.8"
+        "vitest": "^4.0.17"
     }
 }
