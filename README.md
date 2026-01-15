@@ -9,13 +9,13 @@ As Bose announced the deprecation of the SoundTouch lineup and will stop cloud s
 ## Installation
 
 ```bash
-npm i soundretouch-api
+npm i @soundretouch/api
 ```
 
 ## Usage
 
 ```ts
-import { SoundTouchDevice } from 'soundretouch-api'
+import { SoundTouchDevice } from '@soundretouch/api'
 
 const device = new SoundTouchDevice('192.168.1.67')
 
@@ -30,7 +30,7 @@ await device.keyPressAndRelease('PLAY')
 ## WebSocket Asynchronous Notifications
 
 ```ts
-import { SoundTouchDevice } from 'soundretouch-api'
+import { SoundTouchDevice } from '@soundretouch/api'
 
 const device = new SoundTouchDevice('192.168.1.67')
 
@@ -46,7 +46,7 @@ device.onVolumeUpdated((volume) => {
 ## Discovery
 
 ```ts
-import { SoundTouchDiscovery } from 'soundretouch-api'
+import { SoundTouchDiscovery } from '@soundretouch/api'
 
 const handle = SoundTouchDiscovery.start(async (device) => {
     console.log('Found device at', device.host)
