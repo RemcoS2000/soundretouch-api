@@ -1,4 +1,5 @@
 export { SoundTouchDevice } from './src/device/SoundTouchDevice'
+export { SoundTouchDiscovery } from './src/discovery/SoundTouchDiscovery'
 export type { DeviceInfo, DeviceInfoComponent, DeviceNetworkInfo } from './src/types/DeviceInfo'
 export type { Bass } from './src/types/Bass'
 export type { BassCapabilities } from './src/types/BassCapabilities'
