@@ -2,6 +2,8 @@
 
 This is another unofficial TypeScript API library to configure and manage legacy Bose SoundTouch devices.
 
+This project is not affiliated with Bose.
+
 As Bose announced the deprecation of the SoundTouch lineup and will stop cloud support, I wanted to try something out and set up a project to help keep these speakers usable. This project provides an easy-to-use wrapper on the SoundTouch API documented by Bose, and it supports device discovery as well.
 
 ## Installation
@@ -97,3 +99,9 @@ npx tsx scripts/smoke.ts
 ## Docs
 
 - [`docs/SoundTouch-Web-API.pdf`](docs/SoundTouch-Web-API.pdf)
+
+## Compliance Notice
+
+This project uses the Bose SoundTouch Web API. Use of the SoundTouch Materials is subject to Bose's Terms of Use. Refer to the official documentation for the full terms.
+
+Trademark attribution: Bose and SoundTouch are trademarks of Bose Corporation.
