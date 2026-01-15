@@ -1,4 +1,7 @@
 import { SoundTouchDiscovery } from '../src/discovery/SoundTouchDiscovery'
+import { NowPlaying } from '../src/types/NowPlaying'
+import { Presets } from '../src/types/Presets'
+import { Volume } from '../src/types/Volume'
 
 /**
  * Smoke test script to discover SoundTouch devices and fetch their info and volume.
@@ -15,6 +18,19 @@ async function run() {
 
         const nowPlaying = await device.nowPlaying()
         console.log('🎵 Now Playing:', nowPlaying)
+
+        device.onNowPlayingUpdated((nowPlaying: NowPlaying) => {
+            console.log('📡 Now Playing Update:', nowPlaying)
+        })
+        device.onVolumeUpdated((volume: Volume) => {
+            console.log('📡 Volume Update:', volume)
+        })
+        device.onPresetsUpdated((presets: Presets) => {
+            console.log('📡 Presets Update (first item):', presets[0]?.ContentItem)
+        })
+        device.onWebSocketError((error) => {
+            console.error('⚠️ WebSocket error:', error)
+        })
     })
 
     setTimeout(() => {

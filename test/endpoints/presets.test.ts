@@ -11,16 +11,25 @@ describe('presets endpoint', () => {
         const result = await fetchPresets(client)
 
         expect(getXml).toHaveBeenCalledWith('/presets')
-        expect(result).toEqual({ preset: [{ name: 'Preset 1' }] })
+        expect(result).toEqual([{ name: 'Preset 1' }])
     })
 
-    it('returns an empty object when presets are missing', async () => {
+    it('wraps a single preset into an array', async () => {
+        const { client, getXml } = createMockClient()
+        getXml.mockResolvedValue({ presets: { preset: { name: 'Preset 1' } } })
+
+        const result = await fetchPresets(client)
+
+        expect(result).toEqual([{ name: 'Preset 1' }])
+    })
+
+    it('returns an empty array when presets are missing', async () => {
         const { client, getXml } = createMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchPresets(client)
 
-        expect(result).toEqual({})
+        expect(result).toEqual([])
     })
 
     it('propagates errors from GET requests', async () => {

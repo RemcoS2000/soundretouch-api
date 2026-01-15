@@ -45,9 +45,9 @@ export async function sendKeyPress(client: HttpClient, key: SoundTouchKey, state
  * @returns A promise that resolves when the device accepts both key events.
  *
  * @example
- * await sendKeyTap(client, 'PLAY', 'Gabbo')
+ * await sendKeyPressAndRelease(client, 'PLAY', 'Gabbo')
  */
-export async function sendKeyTap(client: HttpClient, key: SoundTouchKey, sender = 'soundretouch-api'): Promise<void> {
+export async function sendKeyPressAndRelease(client: HttpClient, key: SoundTouchKey, sender = 'soundretouch-api'): Promise<void> {
     log('POST /key (press)')
     await sendKeyPress(client, key, 'press', sender)
 

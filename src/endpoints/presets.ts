@@ -1,12 +1,14 @@
 import createDebug from 'debug'
 
 import { HttpClient } from '../client/http'
-import { Presets } from '../types/Presets'
+import { Preset, Presets } from '../types/Presets'
 
 const log = createDebug('soundretouch:endpoints:presets')
 
 type PresetsResponse = {
-    presets?: Presets
+    presets?: {
+        preset?: Preset | Preset[]
+    }
 }
 
 /**
@@ -22,5 +24,10 @@ export async function fetchPresets(client: HttpClient): Promise<Presets> {
     const data = await client.getXml<PresetsResponse>('/presets')
     log('response %O', data.presets ?? {})
 
-    return data.presets ?? {}
+    const preset = data.presets?.preset
+    if (Array.isArray(preset)) {
+        return preset
+    }
+
+    return preset ? [preset] : []
 }

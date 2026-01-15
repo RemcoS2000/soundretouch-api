@@ -22,7 +22,23 @@ const nowPlaying = await device.nowPlaying()
 const volume = await device.volume()
 
 await device.setVolume(25)
-await device.keyTap('PLAY')
+await device.keyPressAndRelease('PLAY')
+```
+
+## WebSocket Asynchronous Notifications
+
+```ts
+import { SoundTouchDevice } from 'soundretouch-api'
+
+const device = new SoundTouchDevice('192.168.1.67')
+
+device.onNowPlayingUpdated((nowPlaying) => {
+    console.log('Now playing changed:', nowPlaying)
+})
+
+device.onVolumeUpdated((volume) => {
+    console.log('Volume changed:', volume)
+})
 ```
 
 ## Discovery
@@ -80,4 +96,4 @@ npx tsx scripts/smoke.ts
 
 ## Docs
 
-- `docs/SoundTouch-Web-API.pdf`
+- [`docs/SoundTouch-Web-API.pdf`](docs/SoundTouch-Web-API.pdf)

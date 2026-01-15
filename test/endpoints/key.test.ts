@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { sendKeyPress, sendKeyTap } from '../../src/endpoints/key'
+import { sendKeyPress, sendKeyPressAndRelease } from '../../src/endpoints/key'
 import { createMockClient } from '../helpers/mockClient'
 
 describe('key endpoint', () => {
@@ -23,7 +23,7 @@ describe('key endpoint', () => {
     it('sends a key tap as press then release', async () => {
         const { client, post } = createMockClient()
 
-        await sendKeyTap(client, 'PLAY', 'Tester')
+        await sendKeyPressAndRelease(client, 'PLAY', 'Tester')
 
         expect(post).toHaveBeenNthCalledWith(1, '/key', '<key state="press" sender="Tester">PLAY</key>')
         expect(post).toHaveBeenNthCalledWith(2, '/key', '<key state="release" sender="Tester">PLAY</key>')

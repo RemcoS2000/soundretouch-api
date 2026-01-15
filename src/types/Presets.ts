@@ -13,6 +13,4 @@ export type Preset = {
     ContentItem?: PresetContentItem
 }
 
-export type Presets = {
-    preset?: Preset | Preset[]
-}
+export type Presets = Preset[]
