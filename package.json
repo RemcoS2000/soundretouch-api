@@ -1,6 +1,7 @@
 {
-    "name": "soundretouch-api",
+    "name": "@soundretouch/api",
     "version": "1.0.0",
+    "description": "Unofficial TypeScript API wrapper for managing Bose SoundTouch devices.",
     "keywords": [
         "bose",
         "soundtouch",
