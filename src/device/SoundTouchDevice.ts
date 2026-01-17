@@ -688,21 +688,4 @@ export class SoundTouchDevice {
 
         return this.wsClient.onError(handler)
     }
-
-    /**
-     * Starts listening for async notifications and returns a handle to stop.
-     *
-     * @returns Handle with a stop method that closes the WebSocket connection.
-     *
-     * @example
-     * const handle = device.listenUpdates()
-     * handle.stop()
-     */
-    listenUpdates(): { stop: () => void } {
-        this.wsClient.ensureConnected()
-
-        return {
-            stop: () => this.wsClient.close(),
-        }
-    }
 }
