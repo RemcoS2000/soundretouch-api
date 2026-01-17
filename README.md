@@ -57,6 +57,21 @@ const handle = SoundTouchDiscovery.start(async (device) => {
 setTimeout(() => handle.stop(), 120000)
 ```
 
+## Proxy Configuration (Dev)
+
+If you need to route HTTP and WebSocket calls through a development proxy, pass
+proxy URLs to the device options. These should be prefixes that accept the
+target URL as an encoded query parameter.
+
+```ts
+import { SoundTouchDevice } from '@soundretouch/api'
+
+const device = new SoundTouchDevice('192.168.1.67', {
+    http: { proxyUrl: 'http://localhost:3734/proxy?url=' },
+    ws: { proxyUrl: 'ws://localhost:3734/proxy?url=' },
+})
+```
+
 ## Implemented Endpoints
 
 - /info
@@ -101,7 +116,5 @@ npx tsx scripts/smoke.ts
 - [`docs/SoundTouch-Web-API.pdf`](docs/SoundTouch-Web-API.pdf)
 
 ## Compliance Notice
-
-This project uses the Bose SoundTouch Web API. Use of the SoundTouch Materials is subject to Bose's Terms of Use. Refer to the official documentation for the full terms.
 
 Trademark attribution: Bose and SoundTouch are trademarks of Bose Corporation.
