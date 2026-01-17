@@ -6,6 +6,7 @@ export type WebSocketClientOptions = {
     autoReconnect?: boolean
     reconnectDelayMs?: number
     unwrap?: boolean
+    proxyUrl?: string
 }
 
 type MessageHandler<T> = (payload: T) => void
@@ -45,7 +46,8 @@ export class WebSocketClient {
         this.closedByUser = false
         this.clearReconnect()
 
-        const url = `ws://${this.host}:8080`
+        const directUrl = `ws://${this.host}:8080`
+        const url = this.options.proxyUrl ? `${this.options.proxyUrl}${encodeURIComponent(directUrl)}` : directUrl
         this.log('connect %s', url)
         this.socket = new WebSocket(url, 'gabbo')
 

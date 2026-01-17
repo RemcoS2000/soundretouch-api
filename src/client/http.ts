@@ -5,11 +5,13 @@ import { parseXml } from './xml'
 
 export interface HttpClientOptions {
     timeoutMs?: number
+    proxyUrl?: string
 }
 
 export class HttpClient {
     private host: string
     private timeoutMs: number
+    private proxyUrl?: string
     private log = createDebug('soundretouch:http')
 
     /**
@@ -21,6 +23,7 @@ export class HttpClient {
     constructor(host: string, options: HttpClientOptions = {}) {
         this.host = host
         this.timeoutMs = options.timeoutMs ?? 10000
+        this.proxyUrl = options.proxyUrl
     }
 
     /**
@@ -71,7 +74,8 @@ export class HttpClient {
     }
 
     private async request(path: string, init: RequestInit): Promise<string> {
-        const url = `http://${this.host}:8090${path.startsWith('/') ? path : `/${path}`}`
+        const directUrl = `http://${this.host}:8090${path.startsWith('/') ? path : `/${path}`}`
+        const url = this.proxyUrl ? `${this.proxyUrl}${encodeURIComponent(directUrl)}` : directUrl
         this.log('request %s %s', init.method, url)
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), this.timeoutMs)
