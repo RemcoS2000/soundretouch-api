@@ -26,6 +26,18 @@ describe('HttpClient', () => {
         expect(globalThis.fetch).toHaveBeenCalledWith('http://device.local:8090/info', expect.any(Object))
     })
 
+    it('routes requests through a proxy when proxyUrl is provided', async () => {
+        const response = new Response('<info><name>Kitchen</name></info>', { status: 200 })
+        ;(globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(response)
+
+        const proxyUrl = 'http://localhost:3734/proxy?url='
+        const client = new HttpClient('device.local', { proxyUrl })
+        await client.getXml<{ info: { name: string } }>('/info')
+
+        const directUrl = 'http://device.local:8090/info'
+        expect(globalThis.fetch).toHaveBeenCalledWith(`${proxyUrl}${encodeURIComponent(directUrl)}`, expect.any(Object))
+    })
+
     it('returns empty objects for empty POST XML responses', async () => {
         const response = new Response('', { status: 200 })
         ;(globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(response)

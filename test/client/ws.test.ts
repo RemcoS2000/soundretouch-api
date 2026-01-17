@@ -55,6 +55,18 @@ describe('WebSocketClient', () => {
         expect(MockWebSocket.instances[0].protocols).toBe('gabbo')
     })
 
+    it('connects through a proxy when proxyUrl is provided', () => {
+        globalThis.WebSocket = MockWebSocket as unknown as typeof WebSocket
+
+        const proxyUrl = 'ws://localhost:3734/proxy?url='
+        const socket = new WebSocketClient('device.local', { proxyUrl })
+        socket.connect()
+
+        const directUrl = 'ws://device.local:8080'
+        expect(MockWebSocket.instances).toHaveLength(1)
+        expect(MockWebSocket.instances[0].url).toBe(`${proxyUrl}${encodeURIComponent(directUrl)}`)
+    })
+
     it('reconnects when autoReconnect is enabled', () => {
         globalThis.WebSocket = MockWebSocket as unknown as typeof WebSocket
         vi.useFakeTimers()
