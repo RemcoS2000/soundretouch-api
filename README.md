@@ -1,10 +1,12 @@
 # SoundRetouch-API
 
-This is another unofficial TypeScript API library to configure and manage legacy Bose SoundTouch devices.
+SoundRetouch-API is an unofficial TypeScript library for configuring and managing legacy Bose SoundTouch devices.
 
-This project is not affiliated with Bose.
+After Bose announced the deprecation of the SoundTouch product line and the shutdown of its cloud services, I wanted to experiment with ways to keep these speakers useful. This library provides a clean, developer-friendly wrapper around the documented SoundTouch local API, with built-in support for asynchronous notifications and a simple approach to device discovery.
 
-As Bose announced the deprecation of the SoundTouch lineup and will stop cloud support, I wanted to try something out and set up a project to help keep these speakers usable. This project provides an easy-to-use wrapper on the SoundTouch API documented by Bose, and it supports device discovery as well.
+The implementation is based on the official SoundTouch Web API documentation and has been tested and validated with a pair of SoundTouch 10 speakers.
+
+This project is independently developed and is not affiliated with Bose.
 
 ## Installation
 
@@ -13,6 +15,8 @@ npm i @soundretouch/api
 ```
 
 ## Usage
+
+Below is a basic example demonstrating how to connect to a SoundTouch device and perform common operations.
 
 ```ts
 import { SoundTouchDevice } from '@soundretouch/api'
@@ -28,6 +32,8 @@ await device.keyPressAndRelease('PLAY')
 ```
 
 ## WebSocket Asynchronous Notifications
+
+The library supports real-time notifications over WebSocket for events such as track changes and volume updates.
 
 ```ts
 import { SoundTouchDevice } from '@soundretouch/api'
@@ -45,6 +51,8 @@ device.onVolumeUpdated((volume) => {
 
 ## Discovery
 
+Devices on the local network can be discovered automatically using the built-in discovery service.
+
 ```ts
 import { SoundTouchDiscovery } from '@soundretouch/api'
 
@@ -59,20 +67,20 @@ setTimeout(() => handle.stop(), 120000)
 
 ## Proxy Configuration (Dev)
 
-If you need to route HTTP and WebSocket calls through a development proxy, pass
-proxy URLs to the device options. These should be prefixes that accept the
-target URL as an encoded query parameter.
+If you need to route HTTP and WebSocket calls through a development proxy, pass proxy URLs to the device options.
 
 ```ts
 import { SoundTouchDevice } from '@soundretouch/api'
 
 const device = new SoundTouchDevice('192.168.1.67', {
-    http: { proxyUrl: 'http://localhost:3734/proxy?url=' },
-    ws: { proxyUrl: 'ws://localhost:3734/proxy?url=' },
+    http: { proxyUrl: 'http://localhost:6767/proxy?url=' },
+    ws: { proxyUrl: 'ws://localhost:6767/proxy?url=' },
 })
 ```
 
 ## Implemented Endpoints
+
+The following SoundTouch API endpoints are currently implemented:
 
 - /info
 - /now_playing
@@ -96,7 +104,7 @@ const device = new SoundTouchDevice('192.168.1.67', {
 
 ## Debug Logging
 
-Enable debug output with the `DEBUG` environment variable. You can target all logs or narrow it down to a single subsystem.
+Debug logging can be enabled using the DEBUG environment variable. Logging can be configured globally or scoped to specific subsystems.
 
 ```
 DEBUG=soundretouch:*
