@@ -113,7 +113,7 @@ npx tsx scripts/smoke.ts
 
 ## Docs
 
-- [`docs/SoundTouch-Web-API.pdf`](docs/SoundTouch-Web-API.pdf)
+- [`docs/SoundTouch-Web-API.pdf`](https://assets.bosecreative.com/m/496577402d128874/original/SoundTouch-Web-API.pdf)
 
 ## Compliance Notice
 
