@@ -1,6 +1,6 @@
 {
     "name": "@soundretouch/api",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "Unofficial TypeScript API wrapper for managing Bose SoundTouch devices.",
     "keywords": [
         "bose",
@@ -22,6 +22,7 @@
         "url": "git+https://github.com/RemcoS2000/soundretouch-api.git"
     },
     "license": "MIT",
+    "author": "RemcoS2000",
     "type": "module",
     "exports": {
         ".": {
