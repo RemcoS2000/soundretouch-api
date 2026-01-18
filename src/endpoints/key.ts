@@ -8,6 +8,8 @@ const log = createDebug('soundretouch:endpoints:key')
 export type SoundTouchKey = KeyValue
 export type KeyPressState = KeyState
 
+const KEY_SENDER = 'Gabbo'
+
 /**
  * Sends a remote button press or release to the device.
  *
@@ -19,15 +21,14 @@ export type KeyPressState = KeyState
  *
  * @param key Key value to send.
  * @param state Key state to send: "press" or "release".
- * @param sender Sender label to include in the request.
  * @returns A promise that resolves when the device accepts the key event.
  *
  * @example
- * await sendKeyPress(client, 'PLAY', 'press', 'Gabbo')
- * await sendKeyPress(client, 'PLAY', 'release', 'Gabbo')
+ * await sendKeyPress(client, 'PLAY', 'press')
+ * await sendKeyPress(client, 'PLAY', 'release')
  */
-export async function sendKeyPress(client: HttpClient, key: SoundTouchKey, state: KeyPressState = 'press', sender = 'soundretouch-api'): Promise<void> {
-    const body = `<key state="${state}" sender="${sender}">${key}</key>`
+export async function sendKeyPress(client: HttpClient, key: SoundTouchKey, state: KeyPressState = 'press'): Promise<void> {
+    const body = `<key state="${state}" sender="${KEY_SENDER}">${key}</key>`
 
     log('POST /key')
     log('payload %s', body)
@@ -41,16 +42,15 @@ export async function sendKeyPress(client: HttpClient, key: SoundTouchKey, state
  * POST /key
  *
  * @param key Key value to send.
- * @param sender Sender label to include in the request.
  * @returns A promise that resolves when the device accepts both key events.
  *
  * @example
- * await sendKeyPressAndRelease(client, 'PLAY', 'Gabbo')
+ * await sendKeyPressAndRelease(client, 'PLAY')
  */
-export async function sendKeyPressAndRelease(client: HttpClient, key: SoundTouchKey, sender = 'soundretouch-api'): Promise<void> {
+export async function sendKeyPressAndRelease(client: HttpClient, key: SoundTouchKey): Promise<void> {
     log('POST /key (press)')
-    await sendKeyPress(client, key, 'press', sender)
+    await sendKeyPress(client, key, 'press')
 
     log('POST /key (release)')
-    await sendKeyPress(client, key, 'release', sender)
+    await sendKeyPress(client, key, 'release')
 }

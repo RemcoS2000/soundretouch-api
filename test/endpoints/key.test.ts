@@ -9,24 +9,24 @@ describe('key endpoint', () => {
 
         await sendKeyPress(client, 'PLAY')
 
-        expect(post).toHaveBeenCalledWith('/key', '<key state="press" sender="soundretouch-api">PLAY</key>')
+        expect(post).toHaveBeenCalledWith('/key', '<key state="press" sender="Gabbo">PLAY</key>')
     })
 
-    it('posts key presses to /key with custom state and sender', async () => {
+    it('posts key presses to /key with custom state', async () => {
         const { client, post } = createMockClient()
 
-        await sendKeyPress(client, 'PAUSE', 'release', 'Remote')
+        await sendKeyPress(client, 'PAUSE', 'release')
 
-        expect(post).toHaveBeenCalledWith('/key', '<key state="release" sender="Remote">PAUSE</key>')
+        expect(post).toHaveBeenCalledWith('/key', '<key state="release" sender="Gabbo">PAUSE</key>')
     })
 
     it('sends a key tap as press then release', async () => {
         const { client, post } = createMockClient()
 
-        await sendKeyPressAndRelease(client, 'PLAY', 'Tester')
+        await sendKeyPressAndRelease(client, 'PLAY')
 
-        expect(post).toHaveBeenNthCalledWith(1, '/key', '<key state="press" sender="Tester">PLAY</key>')
-        expect(post).toHaveBeenNthCalledWith(2, '/key', '<key state="release" sender="Tester">PLAY</key>')
+        expect(post).toHaveBeenNthCalledWith(1, '/key', '<key state="press" sender="Gabbo">PLAY</key>')
+        expect(post).toHaveBeenNthCalledWith(2, '/key', '<key state="release" sender="Gabbo">PLAY</key>')
     })
 
     it('propagates errors from POST requests', async () => {

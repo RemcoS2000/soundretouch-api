@@ -20,6 +20,10 @@ export type NowPlaying = {
         artImageStatus?: ArtStatus
         '#text'?: string
     }
+    time?: {
+        '#text'?: number
+        total?: number
+    }
     playStatus?: PlayStatus
     description?: string
     stationLocation?: string

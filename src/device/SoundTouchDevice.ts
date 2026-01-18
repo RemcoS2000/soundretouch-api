@@ -368,11 +368,11 @@ export class SoundTouchDevice {
      * @returns A promise that resolves when the device accepts the key event.
      *
      * @example
-     * await device.keyPress('PLAY', 'press', 'Gabbo')
-     * await device.keyPress('PLAY', 'release', 'Gabbo')
+     * await device.keyPress('PLAY', 'press')
+     * await device.keyPress('PLAY', 'release')
      */
-    keyPress(key: SoundTouchKey, state: 'press' | 'release' = 'press', sender?: string): Promise<void> {
-        return sendKeyPress(this.httpClient, key, state, sender)
+    keyPress(key: SoundTouchKey, state: 'press' | 'release' = 'press'): Promise<void> {
+        return sendKeyPress(this.httpClient, key, state)
     }
 
     /**
@@ -385,10 +385,10 @@ export class SoundTouchDevice {
      * @returns A promise that resolves when the device accepts both key events.
      *
      * @example
-     * await device.keyPressAndRelease('PLAY', 'Gabbo')
+     * await device.keyPressAndRelease('PLAY')
      */
-    keyPressAndRelease(key: SoundTouchKey, sender?: string): Promise<void> {
-        return sendKeyPressAndRelease(this.httpClient, key, sender)
+    keyPressAndRelease(key: SoundTouchKey): Promise<void> {
+        return sendKeyPressAndRelease(this.httpClient, key)
     }
 
     /**
