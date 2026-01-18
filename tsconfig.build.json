@@ -8,6 +8,6 @@
         "declarationMap": true,
         "sourceMap": true
     },
-    "include": ["index.ts", "src"],
+    "include": ["index.ts", "index.device.ts", "index.discovery.ts", "src"],
     "exclude": ["test", "scripts"]
 }

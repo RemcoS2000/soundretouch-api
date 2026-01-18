@@ -1,6 +1,6 @@
 {
     "name": "@soundretouch/api",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "description": "Unofficial TypeScript API wrapper for managing Bose SoundTouch devices.",
     "keywords": [
         "bose",
@@ -28,6 +28,16 @@
             "types": "./dist/index.d.ts",
             "import": "./dist/index.js",
             "default": "./dist/index.js"
+        },
+        "./device": {
+            "types": "./dist/index.device.d.ts",
+            "import": "./dist/index.device.js",
+            "default": "./dist/index.device.js"
+        },
+        "./discovery": {
+            "types": "./dist/index.discovery.d.ts",
+            "import": "./dist/index.discovery.js",
+            "default": "./dist/index.discovery.js"
         },
         "./package.json": "./package.json"
     },
