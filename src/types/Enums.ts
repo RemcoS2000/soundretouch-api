@@ -34,6 +34,10 @@ export type KeyState = 'press' | 'release'
 
 export type PlayStatus = 'PLAY_STATE' | 'PAUSE_STATE' | 'STOP_STATE' | 'BUFFERING_STATE' | 'INVALID_PLAY_STATUS'
 
+export type ShuffleSetting = 'SHUFFLE_OFF' | 'SHUFFLE_ON'
+
+export type RepeatSetting = 'REPEAT_OFF' | 'REPEAT_ONE' | 'REPEAT_ALL'
+
 export type PresetId = 1 | 2 | 3 | 4 | 5 | 6
 
 export type SourceStatus = 'UNAVAILABLE' | 'READY'

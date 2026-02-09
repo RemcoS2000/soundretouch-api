@@ -14,6 +14,22 @@ describe('trackInfo endpoint', () => {
         expect(result).toEqual({ track: 'Song' })
     })
 
+    it('includes repeatSetting and shuffleSetting when present', async () => {
+        const { client, getXml } = createMockClient()
+        getXml.mockResolvedValue({
+            nowPlaying: {
+                track: 'Song',
+                repeatSetting: 'REPEAT_OFF',
+                shuffleSetting: 'SHUFFLE_ON',
+            },
+        })
+
+        const result = await fetchTrackInfo(client)
+
+        expect(result.repeatSetting).toBe('REPEAT_OFF')
+        expect(result.shuffleSetting).toBe('SHUFFLE_ON')
+    })
+
     it('returns an empty object when track info is missing', async () => {
         const { client, getXml } = createMockClient()
         getXml.mockResolvedValue({})

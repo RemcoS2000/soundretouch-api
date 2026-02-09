@@ -1,16 +1,19 @@
-import { ArtStatus, PlayStatus } from './Enums'
+import { ArtStatus, PlayStatus, RepeatSetting, ShuffleSetting } from './Enums'
 
 export type NowPlayingContentItem = {
     source?: string
     location?: string
-    sourceAccount?: string
+    sourceAccount?: number | string
     isPresetable?: boolean
     itemName?: string
+    containerArt?: string
+    type?: string
 }
 
 export type NowPlaying = {
     deviceID?: string
     source?: string
+    sourceAccount?: number | string
     ContentItem?: NowPlayingContentItem
     track?: string
     artist?: string
@@ -27,4 +30,14 @@ export type NowPlaying = {
     playStatus?: PlayStatus
     description?: string
     stationLocation?: string
+    repeatSetting?: RepeatSetting
+    shuffleSetting?: ShuffleSetting
+    favoriteEnabled?: string
+    skipEnabled?: string
+    skipPreviousEnabled?: string
+    streamType?: string
+    trackID?: string
+    seekSupported?: {
+        value?: boolean
+    }
 }
