@@ -11,6 +11,11 @@ type PresetsResponse = {
     }
 }
 
+const normalizePreset = (preset: Preset): Preset => {
+    const id = Number((preset as { id?: unknown }).id)
+    return Number.isFinite(id) ? { ...preset, id } : { ...preset, id: undefined }
+}
+
 /**
  * Gets the list of current presets from the device.
  *
@@ -26,8 +31,8 @@ export async function fetchPresets(client: HttpClient): Promise<Presets> {
 
     const preset = data.presets?.preset
     if (Array.isArray(preset)) {
-        return preset
+        return preset.map(normalizePreset)
     }
 
-    return preset ? [preset] : []
+    return preset ? [normalizePreset(preset)] : []
 }

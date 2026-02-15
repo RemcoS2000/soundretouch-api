@@ -600,13 +600,17 @@ export class SoundTouchDevice {
 
         return this.wsClient.onMessage<Updates>((update) => {
             const preset = update.presetsUpdated?.presets?.preset
+            const normalizePreset = (item: Preset): Preset => {
+                const id = Number((item as { id?: unknown }).id)
+                return Number.isFinite(id) ? { ...item, id } : { ...item, id: undefined }
+            }
             if (Array.isArray(preset)) {
-                handler(preset)
+                handler(preset.map(normalizePreset))
                 return
             }
 
             if (preset) {
-                handler([preset])
+                handler([normalizePreset(preset)])
             }
         })
     }

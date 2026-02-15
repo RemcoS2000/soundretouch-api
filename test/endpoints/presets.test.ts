@@ -23,6 +23,15 @@ describe('presets endpoint', () => {
         expect(result).toEqual([{ name: 'Preset 1' }])
     })
 
+    it('normalizes preset id to number', async () => {
+        const { client, getXml } = createMockClient()
+        getXml.mockResolvedValue({ presets: { preset: [{ id: '2', name: 'Preset 2' }] } })
+
+        const result = await fetchPresets(client)
+
+        expect(result).toEqual([{ id: 2, name: 'Preset 2' }])
+    })
+
     it('returns an empty array when presets are missing', async () => {
         const { client, getXml } = createMockClient()
         getXml.mockResolvedValue({})

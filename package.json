@@ -55,6 +55,7 @@
         "lint": "eslint . --ext .ts",
         "prepare": "husky",
         "prepublishOnly": "npm run build",
+        "smoke": "tsx scripts/smoke.ts",
         "start": "tsx index.ts",
         "test": "vitest"
     },
