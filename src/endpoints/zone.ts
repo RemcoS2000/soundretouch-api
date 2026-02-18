@@ -1,6 +1,8 @@
 import createDebug from 'debug'
 
 import { HttpClient } from '../client/http'
+import { WebSocketClient } from '../client/ws'
+import { Updates } from '../types/Updates'
 import { Zone, ZoneConfig, ZoneConfigMember, ZoneSlaveConfig } from '../types/Zone'
 
 const log = createDebug('soundretouch:endpoints:zone')
@@ -100,4 +102,21 @@ export async function removeZoneSlave(client: HttpClient, config: ZoneSlaveConfi
     log('payload %s', body)
 
     await client.post('/removeZoneSlave', body)
+}
+
+/**
+ * Subscribes to zone map update notifications from the websocket connection.
+ *
+ * @param wsClient WebSocket client used for async updates.
+ * @param handler Callback invoked when the zone map changes.
+ * @returns Unsubscribe function.
+ */
+export function subscribeZoneUpdated(wsClient: WebSocketClient, handler: () => void): () => void {
+    wsClient.ensureConnected()
+
+    return wsClient.onMessage<Updates>((update) => {
+        if (update.zoneUpdated) {
+            handler()
+        }
+    })
 }

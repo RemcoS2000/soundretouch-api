@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import { fetchVolume, setVolume } from '../../src/endpoints/volume'
-import { createHttpMockClient } from '../helpers/mockClient'
+import { fetchVolume, setVolume, subscribeVolume } from '../../src/endpoints/volume'
+import { createHttpMockClient, createWsMockClient } from '../helpers/mockClient'
 
 describe('volume endpoint', () => {
     it('fetches volume from /volume', async () => {
@@ -53,5 +53,26 @@ describe('volume endpoint', () => {
         post.mockRejectedValue(error)
 
         await expect(setVolume(client, 25)).rejects.toBe(error)
+    })
+
+    it('subscribes to volume websocket updates', () => {
+        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const unsubscribe = vi.fn()
+        let messageHandler: ((update: unknown) => void) | undefined
+
+        onMessage.mockImplementation((handler: (update: unknown) => void) => {
+            messageHandler = handler
+            return unsubscribe
+        })
+
+        const handler = vi.fn()
+        const off = subscribeVolume(client, handler)
+
+        expect(ensureConnected).toHaveBeenCalledTimes(1)
+        expect(onMessage).toHaveBeenCalledTimes(1)
+        expect(off).toBe(unsubscribe)
+
+        messageHandler?.({ volumeUpdated: { volume: { actualvolume: 22 } } })
+        expect(handler).toHaveBeenCalledWith({ actualvolume: 22 })
     })
 })

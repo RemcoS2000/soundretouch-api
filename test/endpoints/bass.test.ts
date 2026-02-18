@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import { fetchBass, setBass } from '../../src/endpoints/bass'
-import { createHttpMockClient } from '../helpers/mockClient'
+import { fetchBass, setBass, subscribeBassUpdated } from '../../src/endpoints/bass'
+import { createHttpMockClient, createWsMockClient } from '../helpers/mockClient'
 
 describe('bass endpoint', () => {
     it('fetches bass from /bass', async () => {
@@ -45,5 +45,26 @@ describe('bass endpoint', () => {
         post.mockRejectedValue(error)
 
         await expect(setBass(client, 2)).rejects.toBe(error)
+    })
+
+    it('subscribes to bass websocket updates', () => {
+        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const unsubscribe = vi.fn()
+        let messageHandler: ((update: unknown) => void) | undefined
+
+        onMessage.mockImplementation((handler: (update: unknown) => void) => {
+            messageHandler = handler
+            return unsubscribe
+        })
+
+        const handler = vi.fn()
+        const off = subscribeBassUpdated(client, handler)
+
+        expect(ensureConnected).toHaveBeenCalledTimes(1)
+        expect(onMessage).toHaveBeenCalledTimes(1)
+        expect(off).toBe(unsubscribe)
+
+        messageHandler?.({ bassUpdated: {} })
+        expect(handler).toHaveBeenCalledTimes(1)
     })
 })

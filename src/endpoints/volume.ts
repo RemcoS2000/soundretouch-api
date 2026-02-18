@@ -1,6 +1,8 @@
 import createDebug from 'debug'
 
 import { HttpClient } from '../client/http'
+import { WebSocketClient } from '../client/ws'
+import { Updates } from '../types/Updates'
 import { Volume } from '../types/Volume'
 
 const log = createDebug('soundretouch:endpoints:volume')
@@ -43,4 +45,24 @@ export async function setVolume(client: HttpClient, value: number, muteenabled?:
     log('payload %s', body)
 
     await client.post('/volume', body)
+}
+
+/**
+ * Subscribes to volume update notifications from the websocket connection.
+ *
+ * @param wsClient WebSocket client used for async updates.
+ * @param handler Callback invoked with the parsed volume payload.
+ * @returns Unsubscribe function.
+ */
+export function subscribeVolume(wsClient: WebSocketClient, handler: (volume: Volume) => void): () => void {
+    wsClient.ensureConnected()
+
+    return wsClient.onMessage<Updates>((update) => {
+        const volumeUpdated = update.volumeUpdated
+        if (!volumeUpdated) {
+            return
+        }
+
+        handler(volumeUpdated.volume ?? {})
+    })
 }

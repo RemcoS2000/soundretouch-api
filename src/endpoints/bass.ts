@@ -1,7 +1,9 @@
 import createDebug from 'debug'
 
 import { HttpClient } from '../client/http'
+import { WebSocketClient } from '../client/ws'
 import { Bass } from '../types/Bass'
+import { Updates } from '../types/Updates'
 
 const log = createDebug('soundretouch:endpoints:bass')
 
@@ -43,4 +45,21 @@ export async function setBass(client: HttpClient, value: number): Promise<void> 
     log('payload %s', body)
 
     await client.post('/bass', body)
+}
+
+/**
+ * Subscribes to bass update notifications from the websocket connection.
+ *
+ * @param wsClient WebSocket client used for async updates.
+ * @param handler Callback invoked when bass changes.
+ * @returns Unsubscribe function.
+ */
+export function subscribeBassUpdated(wsClient: WebSocketClient, handler: () => void): () => void {
+    wsClient.ensureConnected()
+
+    return wsClient.onMessage<Updates>((update) => {
+        if (update.bassUpdated) {
+            handler()
+        }
+    })
 }

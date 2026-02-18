@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import { fetchSources } from '../../src/endpoints/sources'
-import { createHttpMockClient } from '../helpers/mockClient'
+import { fetchSources, subscribeSourcesUpdated } from '../../src/endpoints/sources'
+import { createHttpMockClient, createWsMockClient } from '../helpers/mockClient'
 
 describe('sources endpoint', () => {
     it('fetches sources from /sources', async () => {
@@ -53,5 +53,26 @@ describe('sources endpoint', () => {
         getXml.mockRejectedValue(error)
 
         await expect(fetchSources(client)).rejects.toBe(error)
+    })
+
+    it('subscribes to sources websocket updates', () => {
+        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const unsubscribe = vi.fn()
+        let messageHandler: ((update: unknown) => void) | undefined
+
+        onMessage.mockImplementation((handler: (update: unknown) => void) => {
+            messageHandler = handler
+            return unsubscribe
+        })
+
+        const handler = vi.fn()
+        const off = subscribeSourcesUpdated(client, handler)
+
+        expect(ensureConnected).toHaveBeenCalledTimes(1)
+        expect(onMessage).toHaveBeenCalledTimes(1)
+        expect(off).toBe(unsubscribe)
+
+        messageHandler?.({ sourcesUpdated: {} })
+        expect(handler).toHaveBeenCalledTimes(1)
     })
 })

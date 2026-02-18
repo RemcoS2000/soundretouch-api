@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import { fetchPresets } from '../../src/endpoints/presets'
-import { createHttpMockClient } from '../helpers/mockClient'
+import { fetchPresets, subscribeNowSelectionUpdated, subscribePresetsUpdated } from '../../src/endpoints/presets'
+import { createHttpMockClient, createWsMockClient } from '../helpers/mockClient'
 
 describe('presets endpoint', () => {
     it('fetches presets from /presets', async () => {
@@ -47,5 +47,45 @@ describe('presets endpoint', () => {
         getXml.mockRejectedValue(error)
 
         await expect(fetchPresets(client)).rejects.toBe(error)
+    })
+
+    it('subscribes to now selection websocket updates', () => {
+        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const unsubscribe = vi.fn()
+        let messageHandler: ((update: unknown) => void) | undefined
+
+        onMessage.mockImplementation((handler: (update: unknown) => void) => {
+            messageHandler = handler
+            return unsubscribe
+        })
+
+        const handler = vi.fn()
+        const off = subscribeNowSelectionUpdated(client, handler)
+
+        expect(ensureConnected).toHaveBeenCalledTimes(1)
+        expect(onMessage).toHaveBeenCalledTimes(1)
+        expect(off).toBe(unsubscribe)
+
+        messageHandler?.({ nowSelectionUpdated: { preset: { id: 1, name: 'Preset 1' } } })
+        expect(handler).toHaveBeenCalledWith({ id: 1, name: 'Preset 1' })
+    })
+
+    it('subscribes to presets websocket updates and normalizes id', () => {
+        const { client, ensureConnected, onMessage } = createWsMockClient()
+        let messageHandler: ((update: unknown) => void) | undefined
+
+        onMessage.mockImplementation((handler: (update: unknown) => void) => {
+            messageHandler = handler
+            return vi.fn()
+        })
+
+        const handler = vi.fn()
+        subscribePresetsUpdated(client, handler)
+
+        expect(ensureConnected).toHaveBeenCalledTimes(1)
+        expect(onMessage).toHaveBeenCalledTimes(1)
+
+        messageHandler?.({ presetsUpdated: { presets: { preset: [{ id: '2', name: 'Preset 2' }] } } })
+        expect(handler).toHaveBeenCalledWith([{ id: 2, name: 'Preset 2' }])
     })
 })

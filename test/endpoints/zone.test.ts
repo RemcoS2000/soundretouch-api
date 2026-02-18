@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import { addZoneSlave, fetchZone, removeZoneSlave, setZone } from '../../src/endpoints/zone'
-import { createHttpMockClient } from '../helpers/mockClient'
+import { addZoneSlave, fetchZone, removeZoneSlave, setZone, subscribeZoneUpdated } from '../../src/endpoints/zone'
+import { createHttpMockClient, createWsMockClient } from '../helpers/mockClient'
 
 describe('zone endpoints', () => {
     it('fetches zone state from /getZone', async () => {
@@ -98,5 +98,26 @@ describe('zone endpoints', () => {
                 members: [{ ipaddress: '192.168.1.10', macAddress: '00A040123456' }],
             })
         ).rejects.toBe(error)
+    })
+
+    it('subscribes to zone websocket updates', () => {
+        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const unsubscribe = vi.fn()
+        let messageHandler: ((update: unknown) => void) | undefined
+
+        onMessage.mockImplementation((handler: (update: unknown) => void) => {
+            messageHandler = handler
+            return unsubscribe
+        })
+
+        const handler = vi.fn()
+        const off = subscribeZoneUpdated(client, handler)
+
+        expect(ensureConnected).toHaveBeenCalledTimes(1)
+        expect(onMessage).toHaveBeenCalledTimes(1)
+        expect(off).toBe(unsubscribe)
+
+        messageHandler?.({ zoneUpdated: {} })
+        expect(handler).toHaveBeenCalledTimes(1)
     })
 })
