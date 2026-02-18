@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { fetchBassCapabilities } from '../../src/endpoints/bassCapabilities'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('bassCapabilities endpoint', () => {
     it('fetches bass capabilities from /bassCapabilities', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ bassCapabilities: { bassSupported: true } })
 
         const result = await fetchBassCapabilities(client)
@@ -15,7 +15,7 @@ describe('bassCapabilities endpoint', () => {
     })
 
     it('returns an empty object when bass capabilities are missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchBassCapabilities(client)
@@ -24,7 +24,7 @@ describe('bassCapabilities endpoint', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 

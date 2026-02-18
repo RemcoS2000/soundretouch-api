@@ -21,10 +21,10 @@ export type NowPlaying = {
     stationName?: string
     art?: {
         artImageStatus?: ArtStatus
-        '#text'?: string
+        url?: string
     }
     time?: {
-        '#text'?: number
+        elapsed?: number
         total?: number
     }
     playStatus?: PlayStatus
@@ -39,5 +39,39 @@ export type NowPlaying = {
     trackID?: string
     seekSupported?: {
         value?: boolean
+    }
+}
+
+export type NowPlayingRawResponse = Omit<NowPlaying, 'art' | 'time'> & {
+    art?: {
+        artImageStatus?: ArtStatus
+        '#text'?: string
+    }
+    time?: {
+        '#text'?: number
+        total?: number
+    }
+}
+
+/**
+ * Converts the raw XML response shape to the normalized NowPlaying shape.
+ */
+export function normalizeNowPlaying(nowPlaying?: NowPlayingRawResponse): NowPlaying {
+    if (!nowPlaying) return {}
+
+    return {
+        ...nowPlaying,
+        art: nowPlaying.art
+            ? {
+                  artImageStatus: nowPlaying.art.artImageStatus,
+                  url: nowPlaying.art['#text'],
+              }
+            : undefined,
+        time: nowPlaying.time
+            ? {
+                  elapsed: nowPlaying.time['#text'],
+                  total: nowPlaying.time.total,
+              }
+            : undefined,
     }
 }

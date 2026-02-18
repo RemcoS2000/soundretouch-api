@@ -1,21 +1,45 @@
 import { describe, expect, it } from 'vitest'
 
 import { fetchSources } from '../../src/endpoints/sources'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('sources endpoint', () => {
     it('fetches sources from /sources', async () => {
-        const { client, getXml } = createMockClient()
-        getXml.mockResolvedValue({ sources: { source: [{ source: 'AUX' }] } })
+        const { client, getXml } = createHttpMockClient()
+        getXml.mockResolvedValue({
+            sources: {
+                sourceItem: [
+                    {
+                        source: 'AUX',
+                        sourceAccount: 'AUX',
+                        status: 'READY',
+                        isLocal: 'true',
+                        multiroomallowed: 'true',
+                        '#text': 'AUX IN',
+                    },
+                ],
+            },
+        })
 
         const result = await fetchSources(client)
 
         expect(getXml).toHaveBeenCalledWith('/sources')
-        expect(result).toEqual({ source: [{ source: 'AUX' }] })
+        expect(result).toEqual({
+            sourceItem: [
+                {
+                    source: 'AUX',
+                    sourceAccount: 'AUX',
+                    status: 'READY',
+                    isLocal: true,
+                    multiroomAllowed: true,
+                    name: 'AUX IN',
+                },
+            ],
+        })
     })
 
     it('returns an empty object when sources are missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchSources(client)
@@ -24,7 +48,7 @@ describe('sources endpoint', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 

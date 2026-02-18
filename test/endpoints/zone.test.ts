@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { addZoneSlave, fetchZone, removeZoneSlave, setZone } from '../../src/endpoints/zone'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('zone endpoints', () => {
     it('fetches zone state from /getZone', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ zone: { master: '00A040123456' } })
 
         const result = await fetchZone(client)
@@ -15,7 +15,7 @@ describe('zone endpoints', () => {
     })
 
     it('returns an empty object when zone state is missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchZone(client)
@@ -24,7 +24,7 @@ describe('zone endpoints', () => {
     })
 
     it('posts zone updates to /setZone', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setZone(client, {
             master: '00A040123456',
@@ -39,7 +39,7 @@ describe('zone endpoints', () => {
     })
 
     it('posts zone updates with multiple members', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setZone(client, {
             master: '00A040123456',
@@ -57,7 +57,7 @@ describe('zone endpoints', () => {
     })
 
     it('posts zone slave additions to /addZoneSlave', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await addZoneSlave(client, {
             master: '00A040123456',
@@ -68,7 +68,7 @@ describe('zone endpoints', () => {
     })
 
     it('posts zone slave removals to /removeZoneSlave', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await removeZoneSlave(client, {
             master: '00A040123456',
@@ -79,7 +79,7 @@ describe('zone endpoints', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 
@@ -87,7 +87,7 @@ describe('zone endpoints', () => {
     })
 
     it('propagates errors from POST requests', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
         const error = new Error('write failed')
         post.mockRejectedValue(error)
 

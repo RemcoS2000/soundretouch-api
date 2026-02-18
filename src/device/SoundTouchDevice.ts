@@ -9,7 +9,7 @@ import { fetchCapabilities } from '../endpoints/capabilities'
 import { fetchInfo } from '../endpoints/info'
 import { sendKeyPress, sendKeyPressAndRelease, SoundTouchKey } from '../endpoints/key'
 import { setName } from '../endpoints/name'
-import { fetchNowPlaying } from '../endpoints/nowPlaying'
+import { fetchNowPlaying, subscribeNowPlaying } from '../endpoints/nowPlaying'
 import { fetchPresets } from '../endpoints/presets'
 import { selectSource } from '../endpoints/select'
 import { fetchSources } from '../endpoints/sources'
@@ -419,14 +419,7 @@ export class SoundTouchDevice {
      * device.onNowPlayingUpdated((nowPlaying) => console.log(nowPlaying))
      */
     onNowPlayingUpdated(handler: (nowPlaying: NowPlaying) => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            const nowPlaying = update.nowPlayingUpdated?.nowPlaying
-            if (nowPlaying) {
-                handler(nowPlaying)
-            }
-        })
+        return subscribeNowPlaying(this.wsClient, handler)
     }
 
     /**

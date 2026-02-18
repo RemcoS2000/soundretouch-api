@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { fetchTrackInfo } from '../../src/endpoints/trackInfo'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('trackInfo endpoint', () => {
     it('fetches track info from /trackInfo', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ nowPlaying: { track: 'Song' } })
 
         const result = await fetchTrackInfo(client)
@@ -15,7 +15,7 @@ describe('trackInfo endpoint', () => {
     })
 
     it('includes repeatSetting and shuffleSetting when present', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({
             nowPlaying: {
                 track: 'Song',
@@ -31,7 +31,7 @@ describe('trackInfo endpoint', () => {
     })
 
     it('returns an empty object when track info is missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchTrackInfo(client)
@@ -40,7 +40,7 @@ describe('trackInfo endpoint', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 

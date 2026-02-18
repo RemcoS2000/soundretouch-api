@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { fetchVolume, setVolume } from '../../src/endpoints/volume'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('volume endpoint', () => {
     it('fetches volume from /volume', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ volume: { actualvolume: 15 } })
 
         const result = await fetchVolume(client)
@@ -15,7 +15,7 @@ describe('volume endpoint', () => {
     })
 
     it('returns an empty object when volume is missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchVolume(client)
@@ -24,7 +24,7 @@ describe('volume endpoint', () => {
     })
 
     it('posts normalized volume updates to /volume', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setVolume(client, 101.7)
 
@@ -32,7 +32,7 @@ describe('volume endpoint', () => {
     })
 
     it('posts mute updates alongside volume', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setVolume(client, -3, true)
 
@@ -40,7 +40,7 @@ describe('volume endpoint', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 
@@ -48,7 +48,7 @@ describe('volume endpoint', () => {
     })
 
     it('propagates errors from POST requests', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
         const error = new Error('write failed')
         post.mockRejectedValue(error)
 

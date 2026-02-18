@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { fetchBass, setBass } from '../../src/endpoints/bass'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('bass endpoint', () => {
     it('fetches bass from /bass', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ bass: { value: 4 } })
 
         const result = await fetchBass(client)
@@ -15,7 +15,7 @@ describe('bass endpoint', () => {
     })
 
     it('returns an empty object when bass is missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchBass(client)
@@ -24,7 +24,7 @@ describe('bass endpoint', () => {
     })
 
     it('posts bass updates to /bass', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setBass(client, 5)
 
@@ -32,7 +32,7 @@ describe('bass endpoint', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 
@@ -40,7 +40,7 @@ describe('bass endpoint', () => {
     })
 
     it('propagates errors from POST requests', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
         const error = new Error('write failed')
         post.mockRejectedValue(error)
 

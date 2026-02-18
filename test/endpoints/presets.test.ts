@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { fetchPresets } from '../../src/endpoints/presets'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('presets endpoint', () => {
     it('fetches presets from /presets', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ presets: { preset: [{ name: 'Preset 1' }] } })
 
         const result = await fetchPresets(client)
@@ -15,7 +15,7 @@ describe('presets endpoint', () => {
     })
 
     it('wraps a single preset into an array', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ presets: { preset: { name: 'Preset 1' } } })
 
         const result = await fetchPresets(client)
@@ -24,7 +24,7 @@ describe('presets endpoint', () => {
     })
 
     it('normalizes preset id to number', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ presets: { preset: [{ id: '2', name: 'Preset 2' }] } })
 
         const result = await fetchPresets(client)
@@ -33,7 +33,7 @@ describe('presets endpoint', () => {
     })
 
     it('returns an empty array when presets are missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchPresets(client)
@@ -42,7 +42,7 @@ describe('presets endpoint', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 

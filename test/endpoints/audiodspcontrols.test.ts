@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { fetchAudioDspControls, setAudioDspControls } from '../../src/endpoints/audiodspcontrols'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('audiodspcontrols endpoint', () => {
     it('fetches DSP controls from /audiodspcontrols', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ audiodspcontrols: { audiomode: 'movie' } })
 
         const result = await fetchAudioDspControls(client)
@@ -15,7 +15,7 @@ describe('audiodspcontrols endpoint', () => {
     })
 
     it('returns an empty object when DSP controls are missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchAudioDspControls(client)
@@ -24,7 +24,7 @@ describe('audiodspcontrols endpoint', () => {
     })
 
     it('posts DSP updates to /audiodspcontrols', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setAudioDspControls(client, { audiomode: 'music', videosyncaudiodelay: 120 })
 
@@ -32,7 +32,7 @@ describe('audiodspcontrols endpoint', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 
@@ -40,7 +40,7 @@ describe('audiodspcontrols endpoint', () => {
     })
 
     it('propagates errors from POST requests', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
         const error = new Error('write failed')
         post.mockRejectedValue(error)
 

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { setUserTrackControl } from '../../src/endpoints/userTrackControl'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('userTrackControl endpoint', () => {
     it('posts a seek command with StartSecond when provided', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setUserTrackControl(client, 'SEEK_TO_TIME', 60)
 
@@ -13,7 +13,7 @@ describe('userTrackControl endpoint', () => {
     })
 
     it('posts a command without StartSecond when not provided', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setUserTrackControl(client, 'SEEK_TO_TIME')
 
@@ -21,7 +21,7 @@ describe('userTrackControl endpoint', () => {
     })
 
     it('normalizes negative StartSecond values to 0', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setUserTrackControl(client, 'SEEK_TO_TIME', -10)
 
@@ -29,7 +29,7 @@ describe('userTrackControl endpoint', () => {
     })
 
     it('posts NEXT_TRACK without startSecond attribute', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setUserTrackControl(client, 'NEXT_TRACK')
 
@@ -37,7 +37,7 @@ describe('userTrackControl endpoint', () => {
     })
 
     it('posts REPEAT_ALL_TRACKS without startSecond attribute', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setUserTrackControl(client, 'REPEAT_ALL_TRACKS')
 
@@ -45,7 +45,7 @@ describe('userTrackControl endpoint', () => {
     })
 
     it('ignores startSecond for non-seek commands', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setUserTrackControl(client, 'NEXT_TRACK', 60)
 
@@ -53,7 +53,7 @@ describe('userTrackControl endpoint', () => {
     })
 
     it('propagates POST errors', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
         const error = new Error('network')
         post.mockRejectedValue(error)
 

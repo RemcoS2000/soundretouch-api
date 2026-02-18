@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { fetchAudioProductToneControls, setAudioProductToneControls } from '../../src/endpoints/audioProductToneControls'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('audioproducttonecontrols endpoint', () => {
     it('fetches tone controls from /audioproducttonecontrols', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ audioproducttonecontrols: { bass: 3 } })
 
         const result = await fetchAudioProductToneControls(client)
@@ -15,7 +15,7 @@ describe('audioproducttonecontrols endpoint', () => {
     })
 
     it('returns an empty object when tone controls are missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchAudioProductToneControls(client)
@@ -24,7 +24,7 @@ describe('audioproducttonecontrols endpoint', () => {
     })
 
     it('posts tone updates to /audioproducttonecontrols', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setAudioProductToneControls(client, { bass: 2, treble: -1 })
 
@@ -35,7 +35,7 @@ describe('audioproducttonecontrols endpoint', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 
@@ -43,7 +43,7 @@ describe('audioproducttonecontrols endpoint', () => {
     })
 
     it('propagates errors from POST requests', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
         const error = new Error('write failed')
         post.mockRejectedValue(error)
 

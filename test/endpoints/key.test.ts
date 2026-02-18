@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { sendKeyPress, sendKeyPressAndRelease } from '../../src/endpoints/key'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('key endpoint', () => {
     it('posts key presses to /key with defaults', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await sendKeyPress(client, 'PLAY')
 
@@ -13,7 +13,7 @@ describe('key endpoint', () => {
     })
 
     it('posts key presses to /key with custom state', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await sendKeyPress(client, 'PAUSE', 'release')
 
@@ -21,7 +21,7 @@ describe('key endpoint', () => {
     })
 
     it('sends a key tap as press then release', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await sendKeyPressAndRelease(client, 'PLAY')
 
@@ -30,7 +30,7 @@ describe('key endpoint', () => {
     })
 
     it('propagates errors from POST requests', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
         const error = new Error('write failed')
         post.mockRejectedValue(error)
 
