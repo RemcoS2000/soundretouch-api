@@ -14,6 +14,7 @@ import { fetchPresets } from '../endpoints/presets'
 import { selectSource } from '../endpoints/select'
 import { fetchSources } from '../endpoints/sources'
 import { fetchTrackInfo } from '../endpoints/trackInfo'
+import { setUserTrackControl } from '../endpoints/userTrackControl'
 import { fetchVolume, setVolume } from '../endpoints/volume'
 import { addZoneSlave, fetchZone, removeZoneSlave, setZone } from '../endpoints/zone'
 import { AudioDspControls } from '../types/AudioDspControls'
@@ -24,6 +25,7 @@ import { BassCapabilities } from '../types/BassCapabilities'
 import { Capabilities } from '../types/Capabilities'
 import { ContentItem } from '../types/ContentItem'
 import { DeviceInfo } from '../types/DeviceInfo'
+import { UserTrackControlTypes } from '../types/Enums'
 import { NowPlaying } from '../types/NowPlaying'
 import { Preset, Presets } from '../types/Presets'
 import { Recents } from '../types/Recents'
@@ -389,6 +391,22 @@ export class SoundTouchDevice {
      */
     keyPressAndRelease(key: SoundTouchKey): Promise<void> {
         return sendKeyPressAndRelease(this.httpClient, key)
+    }
+
+    /**
+     * Sends a user track control command to the device.
+     *
+     * POST /userTrackControl
+     *
+     * @param userTrackControlType Track control command to execute.
+     * @param startSecond Optional start time in seconds, used for seek commands.
+     * @returns A promise that resolves when the device accepts the track control command.
+     *
+     * @example
+     * await device.setUserTrackControl('SEEK_TO_TIME', 60)
+     */
+    setUserTrackControl(userTrackControlType: UserTrackControlTypes, startSecond?: number): Promise<void> {
+        return setUserTrackControl(this.httpClient, userTrackControlType, startSecond)
     }
 
     /**
