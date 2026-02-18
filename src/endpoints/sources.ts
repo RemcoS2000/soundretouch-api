@@ -1,12 +1,12 @@
 import createDebug from 'debug'
 
 import { HttpClient } from '../client/http'
-import { Sources } from '../types/Sources'
+import { normalizeSources, Sources, SourcesRawResponse } from '../types/Sources'
 
 const log = createDebug('soundretouch:endpoints:sources')
 
 type SourcesResponse = {
-    sources?: Sources
+    sources?: SourcesRawResponse
 }
 
 /**
@@ -20,7 +20,9 @@ export async function fetchSources(client: HttpClient): Promise<Sources> {
     log('GET /sources')
 
     const data = await client.getXml<SourcesResponse>('/sources')
-    log('response %O', data.sources ?? {})
+    const sources = normalizeSources(data.sources)
 
-    return data.sources ?? {}
+    log('response %O', sources)
+
+    return sources
 }

@@ -1,5 +1,8 @@
 import { ArtStatus, PlayStatus, RepeatSetting, ShuffleSetting } from './Enums'
 
+/**
+ * Normalized types.
+ */
 export type NowPlayingContentItem = {
     source?: string
     location?: string
@@ -42,6 +45,9 @@ export type NowPlaying = {
     }
 }
 
+/**
+ * Raw response types.
+ */
 export type NowPlayingRawResponse = Omit<NowPlaying, 'art' | 'time'> & {
     art?: {
         artImageStatus?: ArtStatus

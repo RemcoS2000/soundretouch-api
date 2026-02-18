@@ -10,12 +10,12 @@ describe('sources endpoint', () => {
             sources: {
                 sourceItem: [
                     {
-                        source: 'AUX',
-                        sourceAccount: 'AUX',
+                        source: 'SPOTIFY',
+                        sourceAccount: 1114435301,
                         status: 'READY',
-                        isLocal: 'true',
+                        isLocal: 'false',
                         multiroomallowed: 'true',
-                        '#text': 'AUX IN',
+                        '#text': 'rem-coot-je@live.nl',
                     },
                 ],
             },
@@ -27,12 +27,12 @@ describe('sources endpoint', () => {
         expect(result).toEqual({
             sourceItem: [
                 {
-                    source: 'AUX',
-                    sourceAccount: 'AUX',
+                    source: 'SPOTIFY',
+                    sourceAccount: 1114435301,
                     status: 'READY',
-                    isLocal: true,
-                    multiroomAllowed: true,
-                    name: 'AUX IN',
+                    isLocal: 'false',
+                    multiroomallowed: 'true',
+                    name: 'rem-coot-je@live.nl',
                 },
             ],
         })
