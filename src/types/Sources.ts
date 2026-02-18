@@ -43,7 +43,7 @@ function normalizeSourceItem(item: SourceItemRawResponse): SourceItem {
 }
 
 /**
- * Converts the raw XML response shape to the normalized Sources shape.
+ * Converts a raw XML response shape to the normalized Sources shape.
  */
 export function normalizeSources(sources?: SourcesRawResponse): Sources {
     if (!sources) return {}

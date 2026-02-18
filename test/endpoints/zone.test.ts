@@ -23,6 +23,23 @@ describe('zone endpoints', () => {
         expect(result).toEqual({})
     })
 
+    it('normalizes zone members from #text to macAddress', async () => {
+        const { client, getXml } = createHttpMockClient()
+        getXml.mockResolvedValue({
+            zone: {
+                master: '00A040123456',
+                member: [{ ipaddress: '192.168.1.10', '#text': '00A040123456' }],
+            },
+        })
+
+        const result = await fetchZone(client)
+
+        expect(result).toEqual({
+            master: '00A040123456',
+            member: [{ ipaddress: '192.168.1.10', macAddress: '00A040123456' }],
+        })
+    })
+
     it('posts zone updates to /setZone', async () => {
         const { client, post } = createHttpMockClient()
 

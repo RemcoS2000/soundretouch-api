@@ -60,7 +60,7 @@ export type NowPlayingRawResponse = Omit<NowPlaying, 'art' | 'time'> & {
 }
 
 /**
- * Converts the raw XML response shape to the normalized NowPlaying shape.
+ * Converts a raw XML response shape to the normalized NowPlaying shape.
  */
 export function normalizeNowPlaying(nowPlaying?: NowPlayingRawResponse): NowPlaying {
     if (!nowPlaying) return {}

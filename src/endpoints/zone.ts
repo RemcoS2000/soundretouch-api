@@ -3,12 +3,12 @@ import createDebug from 'debug'
 import { HttpClient } from '../client/http'
 import { WebSocketClient } from '../client/ws'
 import { Updates } from '../types/Updates'
-import { Zone, ZoneConfig, ZoneConfigMember, ZoneSlaveConfig } from '../types/Zone'
+import { normalizeZone, Zone, ZoneConfig, ZoneConfigMember, ZoneRawResponse, ZoneSlaveConfig } from '../types/Zone'
 
 const log = createDebug('soundretouch:endpoints:zone')
 
 type ZoneResponse = {
-    zone?: Zone
+    zone?: ZoneRawResponse
 }
 
 function buildZoneMembersXml(members: ZoneConfigMember[]): string {
@@ -26,9 +26,11 @@ export async function fetchZone(client: HttpClient): Promise<Zone> {
     log('GET /getZone')
 
     const data = await client.getXml<ZoneResponse>('/getZone')
-    log('response %O', data.zone ?? {})
+    const zone = normalizeZone(data.zone)
 
-    return data.zone ?? {}
+    log('response %O', zone)
+
+    return zone
 }
 
 /**
