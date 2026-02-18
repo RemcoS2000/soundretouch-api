@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { fetchAudioProductLevelControls, setAudioProductLevelControls } from '../../src/endpoints/audioProductLevelControls'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('audioproductlevelcontrols endpoint', () => {
     it('fetches level controls from /audioproductlevelcontrols', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ audioproductlevelcontrols: { frontCenterSpeakerLevel: 1 } })
 
         const result = await fetchAudioProductLevelControls(client)
@@ -15,7 +15,7 @@ describe('audioproductlevelcontrols endpoint', () => {
     })
 
     it('returns an empty object when level controls are missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchAudioProductLevelControls(client)
@@ -24,7 +24,7 @@ describe('audioproductlevelcontrols endpoint', () => {
     })
 
     it('posts level updates to /audioproductlevelcontrols', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setAudioProductLevelControls(client, { frontCenterSpeakerLevel: 2, rearSurroundSpeakersLevel: -1 })
 
@@ -35,7 +35,7 @@ describe('audioproductlevelcontrols endpoint', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 
@@ -43,7 +43,7 @@ describe('audioproductlevelcontrols endpoint', () => {
     })
 
     it('propagates errors from POST requests', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
         const error = new Error('write failed')
         post.mockRejectedValue(error)
 

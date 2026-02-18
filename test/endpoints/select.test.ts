@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { selectSource } from '../../src/endpoints/select'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('select endpoint', () => {
     it('posts a source-only selection to /select', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await selectSource(client, { source: 'AUX' })
 
@@ -13,7 +13,7 @@ describe('select endpoint', () => {
     })
 
     it('escapes XML attribute values', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await selectSource(client, {
             source: 'A&B',
@@ -27,7 +27,7 @@ describe('select endpoint', () => {
     })
 
     it('propagates errors from POST requests', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
         const error = new Error('write failed')
         post.mockRejectedValue(error)
 

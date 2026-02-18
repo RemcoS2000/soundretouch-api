@@ -1,11 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import { fetchInfo } from '../../src/endpoints/info'
-import { createMockClient } from '../helpers/mockClient'
+import { fetchInfo, subscribeInfoUpdated } from '../../src/endpoints/info'
+import { createHttpMockClient, createWsMockClient } from '../helpers/mockClient'
 
 describe('info endpoint', () => {
     it('fetches info from /info', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ info: { name: 'Living Room' } })
 
         const result = await fetchInfo(client)
@@ -15,7 +15,7 @@ describe('info endpoint', () => {
     })
 
     it('returns an empty object when info is missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchInfo(client)
@@ -24,10 +24,31 @@ describe('info endpoint', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 
         await expect(fetchInfo(client)).rejects.toBe(error)
+    })
+
+    it('subscribes to info websocket updates', () => {
+        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const unsubscribe = vi.fn()
+        let messageHandler: ((update: unknown) => void) | undefined
+
+        onMessage.mockImplementation((handler: (update: unknown) => void) => {
+            messageHandler = handler
+            return unsubscribe
+        })
+
+        const handler = vi.fn()
+        const off = subscribeInfoUpdated(client, handler)
+
+        expect(ensureConnected).toHaveBeenCalledTimes(1)
+        expect(onMessage).toHaveBeenCalledTimes(1)
+        expect(off).toBe(unsubscribe)
+
+        messageHandler?.({ infoUpdated: {} })
+        expect(handler).toHaveBeenCalledTimes(1)
     })
 })
