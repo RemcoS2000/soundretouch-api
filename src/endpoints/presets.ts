@@ -15,7 +15,7 @@ type PresetsResponse = {
 
 const normalizePreset = (preset: Preset): Preset => {
     const id = Number((preset as { id?: unknown }).id)
-    return Number.isFinite(id) ? { ...preset, id } : { ...preset, id: undefined }
+    return Number.isFinite(id) ? { ...preset, id } : preset
 }
 
 /**
