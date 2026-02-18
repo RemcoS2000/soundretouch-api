@@ -67,17 +67,21 @@ export function normalizeNowPlaying(nowPlaying?: NowPlayingRawResponse): NowPlay
 
     return {
         ...nowPlaying,
-        art: nowPlaying.art
+        ...(nowPlaying.art
             ? {
-                  artImageStatus: nowPlaying.art.artImageStatus,
-                  url: nowPlaying.art['#text'],
+                  art: {
+                      artImageStatus: nowPlaying.art.artImageStatus,
+                      url: nowPlaying.art['#text'],
+                  },
               }
-            : undefined,
-        time: nowPlaying.time
+            : {}),
+        ...(nowPlaying.time
             ? {
-                  elapsed: nowPlaying.time['#text'],
-                  total: nowPlaying.time.total,
+                  time: {
+                      elapsed: nowPlaying.time['#text'],
+                      total: nowPlaying.time.total,
+                  },
               }
-            : undefined,
+            : {}),
     }
 }

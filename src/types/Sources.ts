@@ -38,7 +38,7 @@ function normalizeSourceItem(item: SourceItemRawResponse): SourceItem {
         status: item.status,
         isLocal: item.isLocal,
         multiroomallowed: item.multiroomallowed,
-        name: item['#text'],
+        ...(item['#text'] ? { name: item['#text'] } : {}),
     }
 }
 
