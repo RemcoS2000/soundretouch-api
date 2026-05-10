@@ -83,25 +83,24 @@ const device = new SoundTouchDevice('192.168.1.67', {
 The following SoundTouch API endpoints are currently implemented:
 
 - /info
-- /now_playing
-- /trackInfo
-- /sources
-- /select
-- /volume
+- /audiodspcontrols
+- /audioproductlevelcontrols
+- /audioproducttonecontrols
+- /AVTransport/Control
 - /bass
 - /bassCapabilities
 - /capabilities
-- /audiodspcontrols
-- /audioproducttonecontrols
-- /audioproductlevelcontrols
-- /presets
-- /name
 - /getZone
-- /setZone
-- /addZoneSlave
-- /removeZoneSlave
 - /key
-- /AVTransport/Control
+- /name
+- /now_playing
+- /presets
+- /select
+- /sources
+- /setZone
+- /removeZoneSlave
+- /trackInfo
+- /volume
 
 ## Debug Logging
 
