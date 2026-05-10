@@ -1,5 +1,8 @@
 import { ArtStatus, PlayStatus, RepeatSetting, ShuffleSetting } from './Enums'
 
+/**
+ * Normalized types.
+ */
 export type NowPlayingContentItem = {
     source?: string
     location?: string
@@ -21,10 +24,10 @@ export type NowPlaying = {
     stationName?: string
     art?: {
         artImageStatus?: ArtStatus
-        '#text'?: string
+        url?: string
     }
     time?: {
-        '#text'?: number
+        elapsed?: number
         total?: number
     }
     playStatus?: PlayStatus
@@ -39,5 +42,46 @@ export type NowPlaying = {
     trackID?: string
     seekSupported?: {
         value?: boolean
+    }
+}
+
+/**
+ * Raw response types.
+ */
+export type NowPlayingRawResponse = Omit<NowPlaying, 'art' | 'time'> & {
+    art?: {
+        artImageStatus?: ArtStatus
+        '#text'?: string
+    }
+    time?: {
+        '#text'?: number
+        total?: number
+    }
+}
+
+/**
+ * Converts a raw XML response shape to the normalized NowPlaying shape.
+ */
+export function normalizeNowPlaying(nowPlaying?: NowPlayingRawResponse): NowPlaying {
+    if (!nowPlaying) return {}
+
+    return {
+        ...nowPlaying,
+        ...(nowPlaying.art
+            ? {
+                  art: {
+                      artImageStatus: nowPlaying.art.artImageStatus,
+                      url: nowPlaying.art['#text'],
+                  },
+              }
+            : {}),
+        ...(nowPlaying.time
+            ? {
+                  time: {
+                      elapsed: nowPlaying.time['#text'],
+                      total: nowPlaying.time.total,
+                  },
+              }
+            : {}),
     }
 }

@@ -5,18 +5,29 @@ import { fetchAudioProductLevelControls, setAudioProductLevelControls } from '..
 import { fetchAudioProductToneControls, setAudioProductToneControls } from '../endpoints/audioProductToneControls'
 import { playStreamUrl } from '../endpoints/avTransport'
 import { fetchBass, setBass } from '../endpoints/bass'
+import { subscribeBassUpdated } from '../endpoints/bass'
 import { fetchBassCapabilities } from '../endpoints/bassCapabilities'
 import { fetchCapabilities } from '../endpoints/capabilities'
-import { fetchInfo } from '../endpoints/info'
+import { fetchInfo, subscribeInfoUpdated } from '../endpoints/info'
 import { sendKeyPress, sendKeyPressAndRelease, SoundTouchKey } from '../endpoints/key'
 import { setName } from '../endpoints/name'
-import { fetchNowPlaying } from '../endpoints/nowPlaying'
-import { fetchPresets } from '../endpoints/presets'
+import { fetchNowPlaying, subscribeNowPlaying } from '../endpoints/nowPlaying'
+import { fetchPresets, subscribeNowSelectionUpdated, subscribePresetsUpdated } from '../endpoints/presets'
 import { selectSource } from '../endpoints/select'
-import { fetchSources } from '../endpoints/sources'
+import { fetchSources, subscribeSourcesUpdated } from '../endpoints/sources'
 import { fetchTrackInfo } from '../endpoints/trackInfo'
-import { fetchVolume, setVolume } from '../endpoints/volume'
-import { addZoneSlave, fetchZone, removeZoneSlave, setZone } from '../endpoints/zone'
+import {
+    subscribeAcctModeUpdated,
+    subscribeConnectionStateUpdated,
+    subscribeErrorNotification,
+    subscribeRecentsUpdated,
+    subscribeSiteSurveyResultsUpdated,
+    subscribeSwUpdateStatusUpdated,
+    subscribeWebSocketError,
+} from '../endpoints/updates'
+import { setUserTrackControl } from '../endpoints/userTrackControl'
+import { fetchVolume, setVolume, subscribeVolume } from '../endpoints/volume'
+import { addZoneSlave, fetchZone, removeZoneSlave, setZone, subscribeZoneUpdated } from '../endpoints/zone'
 import { AudioDspControls } from '../types/AudioDspControls'
 import { AudioProductLevelControls, AudioProductLevelControlsUpdate } from '../types/AudioProductLevelControls'
 import { AudioProductToneControls, AudioProductToneControlsUpdate } from '../types/AudioProductToneControls'
@@ -26,11 +37,11 @@ import { BassCapabilities } from '../types/BassCapabilities'
 import { Capabilities } from '../types/Capabilities'
 import { ContentItem } from '../types/ContentItem'
 import { DeviceInfo } from '../types/DeviceInfo'
+import { UserTrackControlTypes } from '../types/Enums'
 import { NowPlaying } from '../types/NowPlaying'
 import { Preset, Presets } from '../types/Presets'
 import { Recents } from '../types/Recents'
 import { Sources } from '../types/Sources'
-import { Updates } from '../types/Updates'
 import { Volume } from '../types/Volume'
 import { Zone, ZoneConfig, ZoneSlaveConfig } from '../types/Zone'
 
@@ -409,6 +420,22 @@ export class SoundTouchDevice {
     }
 
     /**
+     * Sends a user track control command to the device.
+     *
+     * POST /userTrackControl
+     *
+     * @param userTrackControlType Track control command to execute.
+     * @param startSecond Optional start time in seconds, used for seek commands.
+     * @returns A promise that resolves when the device accepts the track control command.
+     *
+     * @example
+     * await device.setUserTrackControl('SEEK_TO_TIME', 60)
+     */
+    setUserTrackControl(userTrackControlType: UserTrackControlTypes, startSecond?: number): Promise<void> {
+        return setUserTrackControl(this.httpClient, userTrackControlType, startSecond)
+    }
+
+    /**
      * Subscribes to now playing update notifications.
      *
      * @param handler Callback invoked with the parsed now playing payload.
@@ -418,14 +445,7 @@ export class SoundTouchDevice {
      * device.onNowPlayingUpdated((nowPlaying) => console.log(nowPlaying))
      */
     onNowPlayingUpdated(handler: (nowPlaying: NowPlaying) => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            const nowPlaying = update.nowPlayingUpdated?.nowPlaying
-            if (nowPlaying) {
-                handler(nowPlaying)
-            }
-        })
+        return subscribeNowPlaying(this.wsClient, handler)
     }
 
     /**
@@ -438,16 +458,7 @@ export class SoundTouchDevice {
      * device.onVolumeUpdated((volume) => console.log(volume))
      */
     onVolumeUpdated(handler: (volume: Volume) => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            const volumeUpdated = update.volumeUpdated
-            if (!volumeUpdated) {
-                return
-            }
-
-            handler(volumeUpdated.volume ?? {})
-        })
+        return subscribeVolume(this.wsClient, handler)
     }
 
     /**
@@ -460,13 +471,7 @@ export class SoundTouchDevice {
      * device.onBassUpdated(() => console.log('Bass changed'))
      */
     onBassUpdated(handler: () => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            if (update.bassUpdated) {
-                handler()
-            }
-        })
+        return subscribeBassUpdated(this.wsClient, handler)
     }
 
     /**
@@ -479,13 +484,7 @@ export class SoundTouchDevice {
      * device.onZoneUpdated(() => console.log('Zone map changed'))
      */
     onZoneUpdated(handler: () => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            if (update.zoneUpdated) {
-                handler()
-            }
-        })
+        return subscribeZoneUpdated(this.wsClient, handler)
     }
 
     /**
@@ -498,13 +497,7 @@ export class SoundTouchDevice {
      * device.onSwUpdateStatusUpdated(() => console.log('SW update status changed'))
      */
     onSwUpdateStatusUpdated(handler: () => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            if (update.swUpdateStatusUpdated) {
-                handler()
-            }
-        })
+        return subscribeSwUpdateStatusUpdated(this.wsClient, handler)
     }
 
     /**
@@ -517,13 +510,7 @@ export class SoundTouchDevice {
      * device.onSiteSurveyResultsUpdated(() => console.log('Site survey updated'))
      */
     onSiteSurveyResultsUpdated(handler: () => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            if (update.siteSurveyResultsUpdated) {
-                handler()
-            }
-        })
+        return subscribeSiteSurveyResultsUpdated(this.wsClient, handler)
     }
 
     /**
@@ -536,13 +523,7 @@ export class SoundTouchDevice {
      * device.onSourcesUpdated(() => console.log('Sources updated'))
      */
     onSourcesUpdated(handler: () => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            if (update.sourcesUpdated) {
-                handler()
-            }
-        })
+        return subscribeSourcesUpdated(this.wsClient, handler)
     }
 
     /**
@@ -555,14 +536,7 @@ export class SoundTouchDevice {
      * device.onNowSelectionUpdated((preset) => console.log(preset))
      */
     onNowSelectionUpdated(handler: (preset: Preset) => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            const preset = update.nowSelectionUpdated?.preset
-            if (preset) {
-                handler(preset)
-            }
-        })
+        return subscribeNowSelectionUpdated(this.wsClient, handler)
     }
 
     /**
@@ -575,13 +549,7 @@ export class SoundTouchDevice {
      * device.onConnectionStateUpdated(() => console.log('Connection state changed'))
      */
     onConnectionStateUpdated(handler: () => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            if (update.connectionStateUpdated) {
-                handler()
-            }
-        })
+        return subscribeConnectionStateUpdated(this.wsClient, handler)
     }
 
     /**
@@ -594,13 +562,7 @@ export class SoundTouchDevice {
      * device.onInfoUpdated(() => console.log('Device info changed'))
      */
     onInfoUpdated(handler: () => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            if (update.infoUpdated) {
-                handler()
-            }
-        })
+        return subscribeInfoUpdated(this.wsClient, handler)
     }
 
     /**
@@ -613,19 +575,7 @@ export class SoundTouchDevice {
      * device.onPresetsUpdated((presets) => console.log(presets))
      */
     onPresetsUpdated(handler: (presets: Presets) => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            const preset = update.presetsUpdated?.presets?.preset
-            if (Array.isArray(preset)) {
-                handler(preset)
-                return
-            }
-
-            if (preset) {
-                handler([preset])
-            }
-        })
+        return subscribePresetsUpdated(this.wsClient, handler)
     }
 
     /**
@@ -638,19 +588,7 @@ export class SoundTouchDevice {
      * device.onRecentsUpdated((recents) => console.log(recents))
      */
     onRecentsUpdated(handler: (recents: Recents) => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            const recent = update.recentsUpdated?.recents?.recent
-            if (Array.isArray(recent)) {
-                handler(recent)
-                return
-            }
-
-            if (recent) {
-                handler([recent])
-            }
-        })
+        return subscribeRecentsUpdated(this.wsClient, handler)
     }
 
     /**
@@ -663,13 +601,7 @@ export class SoundTouchDevice {
      * device.onAcctModeUpdated(() => console.log('Account mode changed'))
      */
     onAcctModeUpdated(handler: () => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            if (update.acctModeUpdated) {
-                handler()
-            }
-        })
+        return subscribeAcctModeUpdated(this.wsClient, handler)
     }
 
     /**
@@ -682,13 +614,7 @@ export class SoundTouchDevice {
      * device.onErrorNotification((error) => console.log(error))
      */
     onErrorNotification(handler: (error: Record<string, unknown>) => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onMessage<Updates>((update) => {
-            if (update.errorNotification) {
-                handler(update.errorNotification)
-            }
-        })
+        return subscribeErrorNotification(this.wsClient, handler)
     }
 
     /**
@@ -701,8 +627,6 @@ export class SoundTouchDevice {
      * device.onWebSocketError((error) => console.error(error))
      */
     onWebSocketError(handler: (error: unknown) => void): () => void {
-        this.wsClient.ensureConnected()
-
-        return this.wsClient.onError(handler)
+        return subscribeWebSocketError(this.wsClient, handler)
     }
 }

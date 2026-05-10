@@ -7,9 +7,9 @@ export type PresetContentItem = {
 }
 
 export type Preset = {
-    id?: string
-    createdOn?: string
-    updateOn?: string
+    id: number
+    createdOn: string
+    updateOn: string
     ContentItem?: PresetContentItem
 }
 

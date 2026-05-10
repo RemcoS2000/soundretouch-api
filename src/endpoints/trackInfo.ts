@@ -1,12 +1,12 @@
 import createDebug from 'debug'
 
 import { HttpClient } from '../client/http'
-import { NowPlaying } from '../types/NowPlaying'
+import { normalizeNowPlaying, NowPlaying, NowPlayingRawResponse } from '../types/NowPlaying'
 
 const log = createDebug('soundretouch:endpoints:trackinfo')
 
 type TrackInfoResponse = {
-    nowPlaying?: NowPlaying
+    nowPlaying?: NowPlayingRawResponse
 }
 
 /**
@@ -20,6 +20,7 @@ export async function fetchTrackInfo(client: HttpClient): Promise<NowPlaying> {
     log('GET /trackInfo')
 
     const data = await client.getXml<TrackInfoResponse>('/trackInfo')
-    log('response %O', data.nowPlaying ?? {})
-    return data.nowPlaying ?? {}
+    const nowPlaying = normalizeNowPlaying(data.nowPlaying)
+    log('response %O', nowPlaying)
+    return nowPlaying
 }

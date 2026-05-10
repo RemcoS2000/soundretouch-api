@@ -1,11 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import { addZoneSlave, fetchZone, removeZoneSlave, setZone } from '../../src/endpoints/zone'
-import { createMockClient } from '../helpers/mockClient'
+import { addZoneSlave, fetchZone, removeZoneSlave, setZone, subscribeZoneUpdated } from '../../src/endpoints/zone'
+import { createHttpMockClient, createWsMockClient } from '../helpers/mockClient'
 
 describe('zone endpoints', () => {
     it('fetches zone state from /getZone', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({ zone: { master: '00A040123456' } })
 
         const result = await fetchZone(client)
@@ -15,7 +15,7 @@ describe('zone endpoints', () => {
     })
 
     it('returns an empty object when zone state is missing', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         getXml.mockResolvedValue({})
 
         const result = await fetchZone(client)
@@ -23,8 +23,25 @@ describe('zone endpoints', () => {
         expect(result).toEqual({})
     })
 
+    it('normalizes zone members from #text to macAddress', async () => {
+        const { client, getXml } = createHttpMockClient()
+        getXml.mockResolvedValue({
+            zone: {
+                master: '00A040123456',
+                member: [{ ipaddress: '192.168.1.10', '#text': '00A040123456' }],
+            },
+        })
+
+        const result = await fetchZone(client)
+
+        expect(result).toEqual({
+            master: '00A040123456',
+            member: [{ ipaddress: '192.168.1.10', macAddress: '00A040123456' }],
+        })
+    })
+
     it('posts zone updates to /setZone', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setZone(client, {
             master: '00A040123456',
@@ -39,7 +56,7 @@ describe('zone endpoints', () => {
     })
 
     it('posts zone updates with multiple members', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await setZone(client, {
             master: '00A040123456',
@@ -57,7 +74,7 @@ describe('zone endpoints', () => {
     })
 
     it('posts zone slave additions to /addZoneSlave', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await addZoneSlave(client, {
             master: '00A040123456',
@@ -68,7 +85,7 @@ describe('zone endpoints', () => {
     })
 
     it('posts zone slave removals to /removeZoneSlave', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
 
         await removeZoneSlave(client, {
             master: '00A040123456',
@@ -79,7 +96,7 @@ describe('zone endpoints', () => {
     })
 
     it('propagates errors from GET requests', async () => {
-        const { client, getXml } = createMockClient()
+        const { client, getXml } = createHttpMockClient()
         const error = new Error('network')
         getXml.mockRejectedValue(error)
 
@@ -87,7 +104,7 @@ describe('zone endpoints', () => {
     })
 
     it('propagates errors from POST requests', async () => {
-        const { client, post } = createMockClient()
+        const { client, post } = createHttpMockClient()
         const error = new Error('write failed')
         post.mockRejectedValue(error)
 
@@ -98,5 +115,26 @@ describe('zone endpoints', () => {
                 members: [{ ipaddress: '192.168.1.10', macAddress: '00A040123456' }],
             })
         ).rejects.toBe(error)
+    })
+
+    it('subscribes to zone websocket updates', () => {
+        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const unsubscribe = vi.fn()
+        let messageHandler: ((update: unknown) => void) | undefined
+
+        onMessage.mockImplementation((handler: (update: unknown) => void) => {
+            messageHandler = handler
+            return unsubscribe
+        })
+
+        const handler = vi.fn()
+        const off = subscribeZoneUpdated(client, handler)
+
+        expect(ensureConnected).toHaveBeenCalledTimes(1)
+        expect(onMessage).toHaveBeenCalledTimes(1)
+        expect(off).toBe(unsubscribe)
+
+        messageHandler?.({ zoneUpdated: {} })
+        expect(handler).toHaveBeenCalledTimes(1)
     })
 })

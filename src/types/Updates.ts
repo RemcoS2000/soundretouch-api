@@ -1,4 +1,4 @@
-import type { NowPlaying } from './NowPlaying'
+import type { NowPlayingRawResponse } from './NowPlaying'
 import type { Preset } from './Presets'
 import type { Recent } from './Recents'
 import type { Volume } from './Volume'
@@ -6,7 +6,7 @@ import type { Volume } from './Volume'
 export type Updates = {
     deviceID?: string
     nowPlayingUpdated?: {
-        nowPlaying?: NowPlaying
+        nowPlaying?: NowPlayingRawResponse
     }
     presetsUpdated?: {
         presets?: {

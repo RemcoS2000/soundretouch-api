@@ -43,3 +43,14 @@ export type PresetId = 1 | 2 | 3 | 4 | 5 | 6
 export type SourceStatus = 'UNAVAILABLE' | 'READY'
 
 export type AudioMode = 'AUDIO_MODE_DIRECT' | 'AUDIO_MODE_NORMAL' | 'AUDIO_MODE_DIALOG' | 'AUDIO_MODE_NIGHT'
+
+export type UserTrackControlTypes =
+    | 'NEXT_TRACK'
+    | 'PREV_TRACK'
+    | 'PREV_TRACK_FORCE'
+    | 'REPEAT_ONE_TRACK'
+    | 'REPEAT_ALL_TRACKS'
+    | 'REPEAT_TRACKS_OFF'
+    | 'SHUFFLE_TRACKS_ON'
+    | 'SHUFFLE_TRACKS_OFF'
+    | 'SEEK_TO_TIME'
