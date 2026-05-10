@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { playAvTransport, playStreamUrl, setAvTransportUri } from '../../src/endpoints/avTransport'
-import { createMockClient } from '../helpers/mockClient'
+import { createHttpMockClient } from '../helpers/mockClient'
 
 describe('avTransport endpoint', () => {
     it('posts a set-av-transport-uri SOAP request with escaped stream data', async () => {
-        const { client, postXml } = createMockClient()
+        const { client, postXml } = createHttpMockClient()
         postXml.mockResolvedValue({ Envelope: { Body: {} } })
 
         await setAvTransportUri(client, 'http://example.com/radio?station=A&B', '<meta>test</meta>')
@@ -27,7 +27,7 @@ describe('avTransport endpoint', () => {
     })
 
     it('posts a play SOAP request', async () => {
-        const { client, postXml } = createMockClient()
+        const { client, postXml } = createHttpMockClient()
         postXml.mockResolvedValue({ Envelope: { Body: {} } })
 
         await playAvTransport(client)
@@ -38,7 +38,7 @@ describe('avTransport endpoint', () => {
     })
 
     it('loads a stream url before starting playback', async () => {
-        const { client, postXml } = createMockClient()
+        const { client, postXml } = createHttpMockClient()
         postXml.mockResolvedValue({ Envelope: { Body: {} } })
 
         await playStreamUrl(client, 'http://example.com/radio.mp3')
@@ -57,7 +57,7 @@ describe('avTransport endpoint', () => {
     })
 
     it('propagates errors from av transport requests', async () => {
-        const { client, postXml } = createMockClient()
+        const { client, postXml } = createHttpMockClient()
         const error = new Error('write failed')
         postXml.mockRejectedValue(error)
 
