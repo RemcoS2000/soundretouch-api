@@ -6,12 +6,14 @@ import { parseXml } from './xml'
 export interface HttpClientOptions {
     timeoutMs?: number
     proxyUrl?: string
+    port?: number
 }
 
 export class HttpClient {
     private host: string
     private timeoutMs: number
     private proxyUrl?: string
+    private port: number
     private log = createDebug('soundretouch:http')
 
     /**
@@ -24,6 +26,7 @@ export class HttpClient {
         this.host = host
         this.timeoutMs = options.timeoutMs ?? 10000
         this.proxyUrl = options.proxyUrl
+        this.port = options.port ?? 8090
     }
 
     /**
@@ -44,11 +47,14 @@ export class HttpClient {
      * @param body Optional XML body to send.
      * @returns Promise<T> A promise that resolves to the parsed XML response.
      */
-    async postXml<T>(path: string, body?: string): Promise<T> {
+    async postXml<T>(path: string, body?: string, headers: HeadersInit = {}): Promise<T> {
         const text = await this.request(path, {
             method: 'POST',
             body,
-            headers: { 'Content-Type': 'text/xml' },
+            headers: {
+                'Content-Type': 'text/xml',
+                ...headers,
+            },
         })
 
         if (!text) {
@@ -65,16 +71,19 @@ export class HttpClient {
      * @param body Optional XML body to send.
      * @returns Promise<void> A promise that resolves when the request completes.
      */
-    async post(path: string, body?: string): Promise<void> {
+    async post(path: string, body?: string, headers: HeadersInit = {}): Promise<void> {
         await this.request(path, {
             method: 'POST',
             body,
-            headers: { 'Content-Type': 'text/xml' },
+            headers: {
+                'Content-Type': 'text/xml',
+                ...headers,
+            },
         })
     }
 
     private async request(path: string, init: RequestInit): Promise<string> {
-        const directUrl = `http://${this.host}:8090${path.startsWith('/') ? path : `/${path}`}`
+        const directUrl = `http://${this.host}:${this.port}${path.startsWith('/') ? path : `/${path}`}`
         const url = this.proxyUrl ? `${this.proxyUrl}${encodeURIComponent(directUrl)}` : directUrl
         this.log('request %s %s', init.method, url)
         const controller = new AbortController()

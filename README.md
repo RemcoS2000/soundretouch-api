@@ -2,7 +2,7 @@
 
 SoundRetouch-API is an unofficial TypeScript library for configuring and managing legacy Bose SoundTouch devices.
 
-After Bose announced the deprecation of the SoundTouch product line and the shutdown of its cloud services, I wanted to experiment with ways to keep these speakers useful. This library provides a clean, developer-friendly wrapper around the documented SoundTouch local API, with built-in support for asynchronous notifications and a simple approach to device discovery.
+After Bose announced the deprecation of the SoundTouch product line and the shutdown of its cloud services, I wanted to experiment with ways to keep these speakers useful. This library provides a clean, developer-friendly wrapper around the documented SoundTouch local API, with built-in support for asynchronous notifications, AVTransport stream playback, and a simple approach to device discovery.
 
 The implementation is based on the official SoundTouch Web API documentation and has been tested and validated with a pair of SoundTouch 10 speakers.
 
@@ -83,24 +83,24 @@ const device = new SoundTouchDevice('192.168.1.67', {
 The following SoundTouch API endpoints are currently implemented:
 
 - /info
-- /now_playing
-- /trackInfo
-- /sources
-- /select
-- /volume
+- /audiodspcontrols
+- /audioproductlevelcontrols
+- /audioproducttonecontrols
+- /AVTransport/Control
 - /bass
 - /bassCapabilities
 - /capabilities
-- /audiodspcontrols
-- /audioproducttonecontrols
-- /audioproductlevelcontrols
-- /presets
-- /name
 - /getZone
-- /setZone
-- /addZoneSlave
-- /removeZoneSlave
 - /key
+- /name
+- /now_playing
+- /presets
+- /select
+- /sources
+- /setZone
+- /removeZoneSlave
+- /trackInfo
+- /volume
 
 ## Debug Logging
 
