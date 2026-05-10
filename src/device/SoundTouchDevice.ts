@@ -3,6 +3,7 @@ import { WebSocketClient, WebSocketClientOptions } from '../client/ws'
 import { fetchAudioDspControls, setAudioDspControls } from '../endpoints/audiodspcontrols'
 import { fetchAudioProductLevelControls, setAudioProductLevelControls } from '../endpoints/audioProductLevelControls'
 import { fetchAudioProductToneControls, setAudioProductToneControls } from '../endpoints/audioProductToneControls'
+import { playStreamUrl } from '../endpoints/avTransport'
 import { fetchBass, setBass } from '../endpoints/bass'
 import { fetchBassCapabilities } from '../endpoints/bassCapabilities'
 import { fetchCapabilities } from '../endpoints/capabilities'
@@ -19,6 +20,7 @@ import { addZoneSlave, fetchZone, removeZoneSlave, setZone } from '../endpoints/
 import { AudioDspControls } from '../types/AudioDspControls'
 import { AudioProductLevelControls, AudioProductLevelControlsUpdate } from '../types/AudioProductLevelControls'
 import { AudioProductToneControls, AudioProductToneControlsUpdate } from '../types/AudioProductToneControls'
+import { AvTransportResponse } from '../types/AvTransport'
 import { Bass } from '../types/Bass'
 import { BassCapabilities } from '../types/BassCapabilities'
 import { Capabilities } from '../types/Capabilities'
@@ -51,11 +53,13 @@ export class SoundTouchDevice {
     readonly host: string
 
     private httpClient: HttpClient
+    private avTransportClient: HttpClient
     private wsClient: WebSocketClient
 
     constructor(host: string, options: SoundTouchDeviceOptions = {}) {
         this.host = host
-        this.httpClient = new HttpClient(host, options.http)
+        this.httpClient = new HttpClient(host, { ...options.http, port: 8090 })
+        this.avTransportClient = new HttpClient(host, { ...options.http, port: 8091 })
         this.wsClient = new WebSocketClient(this.host, { unwrap: true, ...options.ws })
     }
 
@@ -121,6 +125,19 @@ export class SoundTouchDevice {
      */
     select(item: ContentItem): Promise<void> {
         return selectSource(this.httpClient, item)
+    }
+
+    /**
+     * Loads a stream URL and starts playback.
+     *
+     * POST /AVTransport/Control
+     *
+     * @param currentUri Stream or media URL to load.
+     * @param currentUriMetaData Optional metadata, left empty for the MVP.
+     * @returns A promise that resolves when the device accepts both SOAP calls.
+     */
+    playStreamUrl(currentUri: string, currentUriMetaData = ''): Promise<AvTransportResponse> {
+        return playStreamUrl(this.avTransportClient, currentUri, currentUriMetaData)
     }
 
     /**
