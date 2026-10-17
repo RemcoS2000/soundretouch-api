@@ -14,11 +14,14 @@ export type DiscoveryHandle = {
  * Starts mDNS discovery for SoundTouch devices and invokes the callback on first sight of each host.
  *
  * @param onDeviceFound Callback invoked when a new SoundTouch device is found.
- * @param returns a handle that can be used to stop discovery when no longer needed.
+ * @returns A handle that stops discovery when it is no longer needed.
  */
 export class SoundTouchDiscovery {
     private static readonly log = createDebug('soundretouch:discovery')
 
+    /**
+     * Starts discovery and returns the cleanup handle for its Bonjour browser.
+     */
     static start(onDeviceFound: (device: SoundTouchDevice) => void): DiscoveryHandle {
         this.log('🔍 Starting SoundTouch discovery...')
 
@@ -26,13 +29,16 @@ export class SoundTouchDiscovery {
         const seen = new Set<string>()
         const browser = instance.find({ type: 'soundtouch', protocol: 'tcp' }, (service) => {
             const host = service.addresses?.[0]
+
             if (!host) {
                 this.log('⚠️ Service without address, skipping: %O', service)
+
                 return
             }
 
             if (seen.has(host)) {
                 this.log('🔁 Duplicate host %s ignored', host)
+
                 return
             }
 

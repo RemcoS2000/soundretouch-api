@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
     push:
@@ -15,16 +15,18 @@ jobs:
             - name: Use Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                  node-version-file: .nvmrc
 
             - name: Install dependencies
               run: npm ci
 
-            - name: Lint
-              run: npm run lint
+            - name: Verify quality and regression checks
+              run: npm run verify
 
-            - name: Build
-              run: npm run build
-
-            - name: Test
-              run: npm test
+            - uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: api-quality-reports
+                  path: |
+                      coverage/
+                      reports/

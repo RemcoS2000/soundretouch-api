@@ -6,7 +6,7 @@
     "semi": false,
     "trailingComma": "es5",
     "bracketSpacing": true,
-    "jsxBracketSameLine": false,
+    "bracketSameLine": false,
     "arrowParens": "always",
     "plugins": ["prettier-plugin-packagejson", "@trivago/prettier-plugin-sort-imports"],
     "importOrder": ["^\\u0000", "^node:", "^[a-zA-Z]", "^@/", "^\\.\\.(?!/?$)", "^\\.\\./?$", "^\\./"],

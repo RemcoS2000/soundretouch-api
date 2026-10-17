@@ -1,0 +1,9 @@
+{
+    "threshold": 0,
+    "minLines": 10,
+    "minTokens": 100,
+    "reporters": ["console", "json"],
+    "output": "reports/duplication",
+    "ignore": ["**/node_modules/**", "**/dist/**", "**/coverage/**", "**/reports/**"],
+    "absolute": false
+}

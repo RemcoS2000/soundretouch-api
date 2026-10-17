@@ -11,7 +11,12 @@
         "skipLibCheck": true,
         "declaration": true,
         "noEmit": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitOverride": true
     },
-    "include": ["index.ts", "src", "test"]
+    "include": ["index*.ts", "src", "test", "scripts", "vitest.config.ts"]
 }
