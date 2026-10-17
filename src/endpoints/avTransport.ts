@@ -1,12 +1,15 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
-import { AvTransportResponse } from '../types/AvTransport'
+import { type HttpClient } from '../client/http'
+import { type AvTransportResponse } from '../types/AvTransport'
 
 const log = createDebug('soundretouch:endpoints:avtransport')
 
 const AV_TRANSPORT_SERVICE = 'urn:schemas-upnp-org:service:AVTransport:1'
 
+/**
+ * Escapes values before inserting them into the transport XML payload.
+ */
 function escapeXml(value: string): string {
     return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
 }
@@ -43,6 +46,7 @@ export async function setAvTransportUri(client: HttpClient, currentUri: string, 
     })
 
     log('response %O', response.Envelope?.Body ?? {})
+
     return response
 }
 
@@ -75,6 +79,7 @@ export async function playAvTransport(client: HttpClient): Promise<AvTransportRe
     })
 
     log('response %O', response.Envelope?.Body ?? {})
+
     return response
 }
 
@@ -90,5 +95,6 @@ export async function playAvTransport(client: HttpClient): Promise<AvTransportRe
  */
 export async function playStreamUrl(client: HttpClient, currentUri: string, currentUriMetaData = ''): Promise<AvTransportResponse> {
     await setAvTransportUri(client, currentUri, currentUriMetaData)
+
     return playAvTransport(client)
 }

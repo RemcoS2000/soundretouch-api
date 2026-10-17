@@ -1,7 +1,7 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
-import { UserTrackControlTypes } from '../types/Enums'
+import { type HttpClient } from '../client/http'
+import { type UserTrackControlTypes } from '../types/Enums'
 
 const log = createDebug('soundretouch:endpoints:usertrackcontrol')
 
@@ -10,6 +10,7 @@ const log = createDebug('soundretouch:endpoints:usertrackcontrol')
  *
  * POST /userTrackControl
  *
+ * @param client HTTP client for the target device.
  * @param userTrackControlType Track control command to execute.
  * @param startSecond Optional start time in seconds, used for seek commands.
  * @returns A promise that resolves when the device accepts the control command.
@@ -19,6 +20,7 @@ const log = createDebug('soundretouch:endpoints:usertrackcontrol')
  */
 export async function setUserTrackControl(client: HttpClient, userTrackControlType: UserTrackControlTypes, startSecond?: number): Promise<void> {
     let startSecondAttr = ''
+
     if (userTrackControlType === 'SEEK_TO_TIME' && typeof startSecond === 'number') {
         startSecondAttr = ` startSecond="${Math.max(0, Math.round(startSecond))}"`
     }

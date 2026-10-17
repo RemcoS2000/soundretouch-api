@@ -1,20 +1,20 @@
-import { SourceStatus } from './Enums'
+import { type SourceStatus } from './Enums'
 
 /**
  * Normalized types.
  */
 export type SourceItem = {
-    source?: string
-    sourceAccount?: number
-    status?: SourceStatus
-    isLocal?: boolean
-    multiroomallowed?: boolean
-    name?: string
+    source?: string | undefined
+    sourceAccount?: number | undefined
+    status?: SourceStatus | undefined
+    isLocal?: boolean | undefined
+    multiroomallowed?: boolean | undefined
+    name?: string | undefined
 }
 
 export type Sources = {
-    deviceID?: string
-    sourceItem?: SourceItem | SourceItem[]
+    deviceID?: string | undefined
+    sourceItem?: SourceItem | SourceItem[] | undefined
 }
 
 /**
@@ -25,7 +25,7 @@ export type SourceItemRawResponse = Omit<SourceItem, 'name'> & {
 }
 
 export type SourcesRawResponse = Omit<Sources, 'sourceItem'> & {
-    sourceItem?: SourceItemRawResponse | SourceItemRawResponse[]
+    sourceItem?: SourceItemRawResponse | SourceItemRawResponse[] | undefined
 }
 
 /**
@@ -46,13 +46,17 @@ function normalizeSourceItem(item: SourceItemRawResponse): SourceItem {
  * Converts a raw XML response shape to the normalized Sources shape.
  */
 export function normalizeSources(sources?: SourcesRawResponse): Sources {
-    if (!sources) return {}
+    if (!sources) {
+        return {}
+    }
 
-    const sourceItem = Array.isArray(sources.sourceItem)
-        ? sources.sourceItem.map((item) => normalizeSourceItem(item))
-        : sources.sourceItem
-          ? normalizeSourceItem(sources.sourceItem)
-          : undefined
+    let sourceItem: SourceItem | SourceItem[] | undefined
+
+    if (Array.isArray(sources.sourceItem)) {
+        sourceItem = sources.sourceItem.map(normalizeSourceItem)
+    } else if (sources.sourceItem) {
+        sourceItem = normalizeSourceItem(sources.sourceItem)
+    }
 
     return {
         deviceID: sources.deviceID,

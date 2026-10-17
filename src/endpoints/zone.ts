@@ -2,6 +2,7 @@ import createDebug from 'debug'
 
 import { type HttpClient, type RequestOptions } from '../client/http'
 import { type WebSocketClient } from '../client/ws'
+import { escapeXml } from '../client/xml'
 import { type Updates } from '../types/Updates'
 import { normalizeZone, type Zone, type ZoneConfig, type ZoneConfigMember, type ZoneRawResponse, type ZoneSlaveConfig } from '../types/Zone'
 
@@ -15,7 +16,7 @@ type ZoneResponse = {
  * Encodes reported member addresses and IDs as escaped zone XML.
  */
 function buildZoneMembersXml(members: ZoneConfigMember[]): string {
-    return members.map((member) => `<member ipaddress="${member.ipaddress}">${member.macAddress}</member>`).join('')
+    return members.map((member) => `<member ipaddress="${escapeXml(member.ipaddress)}">${escapeXml(member.macAddress)}</member>`).join('')
 }
 
 /**
@@ -56,7 +57,7 @@ export async function fetchZone(client: HttpClient, options?: RequestOptions): P
  */
 export async function setZone(client: HttpClient, config: ZoneConfig): Promise<void> {
     const membersXml = buildZoneMembersXml(config.members)
-    const body = `<zone master="${config.master}" senderIPAddress="${config.senderIPAddress}">${membersXml}</zone>`
+    const body = `<zone master="${escapeXml(config.master)}" senderIPAddress="${escapeXml(config.senderIPAddress)}">${membersXml}</zone>`
 
     log('POST /setZone')
     log('payload %s', body)
@@ -80,7 +81,7 @@ export async function setZone(client: HttpClient, config: ZoneConfig): Promise<v
  */
 export async function addZoneSlave(client: HttpClient, config: ZoneSlaveConfig): Promise<void> {
     const membersXml = buildZoneMembersXml(config.members)
-    const body = `<zone master="${config.master}">${membersXml}</zone>`
+    const body = `<zone master="${escapeXml(config.master)}">${membersXml}</zone>`
 
     log('POST /addZoneSlave')
     log('payload %s', body)
@@ -104,7 +105,7 @@ export async function addZoneSlave(client: HttpClient, config: ZoneSlaveConfig):
  */
 export async function removeZoneSlave(client: HttpClient, config: ZoneSlaveConfig): Promise<void> {
     const membersXml = buildZoneMembersXml(config.members)
-    const body = `<zone master="${config.master}">${membersXml}</zone>`
+    const body = `<zone master="${escapeXml(config.master)}">${membersXml}</zone>`
 
     log('POST /removeZoneSlave')
     log('payload %s', body)

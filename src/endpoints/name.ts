@@ -1,9 +1,12 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
+import { type HttpClient } from '../client/http'
 
 const log = createDebug('soundretouch:endpoints:name')
 
+/**
+ * Escapes the device name before inserting it into the XML payload.
+ */
 function escapeXml(value: string): string {
     return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
 }
@@ -13,6 +16,7 @@ function escapeXml(value: string): string {
  *
  * POST /name
  *
+ * @param client HTTP client for the target device.
  * @param name The name to assign to the device.
  * @returns A promise that resolves when the device accepts the new name.
  *

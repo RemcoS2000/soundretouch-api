@@ -5,6 +5,25 @@ const parser = new XMLParser({
     attributeNamePrefix: '',
     parseAttributeValue: true,
     parseTagValue: true,
+    // Numeric-looking identities must retain leading zeros and string semantics.
+    attributeValueProcessor: (name, value) => (['deviceID', 'master', 'macAddress', 'sourceAccount'].includes(name) ? undefined : value),
+    tagValueProcessor: (name, value) =>
+        [
+            'member',
+            'macAddress',
+            'name',
+            'type',
+            'track',
+            'artist',
+            'album',
+            'itemName',
+            'sourceItem',
+            'stationName',
+            'serialNumber',
+            'softwareVersion',
+        ].includes(name)
+            ? undefined
+            : value,
     trimValues: true,
 })
 
@@ -16,4 +35,11 @@ const parser = new XMLParser({
  */
 export function parseXml<T>(xml: string): T {
     return parser.parse(xml) as T
+}
+
+/**
+ * Escapes text and attribute values in outgoing XML.
+ */
+export function escapeXml(value: string): string {
+    return value.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[char]!)
 }

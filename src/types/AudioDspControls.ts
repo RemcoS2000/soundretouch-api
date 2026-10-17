@@ -1,4 +1,4 @@
-import { AudioMode } from './Enums'
+import { type AudioMode } from './Enums'
 
 export type AudioDspControls = {
     audiomode?: AudioMode

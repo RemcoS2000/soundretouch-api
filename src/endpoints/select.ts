@@ -1,17 +1,24 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
-import { ContentItem } from '../types/ContentItem'
+import { type HttpClient } from '../client/http'
+import { type ContentItem } from '../types/ContentItem'
 
 const log = createDebug('soundretouch:endpoints:select')
 
+/**
+ * Escapes source values before inserting them into the selection XML payload.
+ */
 function escapeXml(value: string): string {
     return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
 }
 
+/**
+ * Builds a source selection payload with its optional account identity.
+ */
 function buildContentItemXml(item: ContentItem): string {
     const source = `source="${escapeXml(item.source)}"`
     const account = item.sourceAccount ? ` sourceAccount="${escapeXml(item.sourceAccount)}"` : ''
+
     return `<ContentItem ${source}${account}></ContentItem>`
 }
 
@@ -23,6 +30,7 @@ function buildContentItemXml(item: ContentItem): string {
  *
  * POST /select
  *
+ * @param client HTTP client for the target device.
  * @param item ContentItem describing the source and optional source account.
  * @returns A promise that resolves when the device accepts the selection.
  *
@@ -33,6 +41,7 @@ function buildContentItemXml(item: ContentItem): string {
  */
 export async function selectSource(client: HttpClient, item: ContentItem): Promise<void> {
     const body = buildContentItemXml(item)
+
     log('POST /select')
     log('payload %s', body)
 

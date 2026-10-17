@@ -1,7 +1,7 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
-import { KeyState, KeyValue } from '../types/Enums'
+import { type HttpClient } from '../client/http'
+import { type KeyState, type KeyValue } from '../types/Enums'
 
 const log = createDebug('soundretouch:endpoints:key')
 
@@ -19,6 +19,7 @@ const KEY_SENDER = 'Gabbo'
  * For a full listing of supported keys see "KEY VALUE" in section 4.1 of the API docs.
  * It is good practice to send a "press" followed by a "release" to simulate a full key click.
  *
+ * @param client HTTP client for the target device.
  * @param key Key value to send.
  * @param state Key state to send: "press" or "release".
  * @returns A promise that resolves when the device accepts the key event.
@@ -41,6 +42,7 @@ export async function sendKeyPress(client: HttpClient, key: SoundTouchKey, state
  *
  * POST /key
  *
+ * @param client HTTP client for the target device.
  * @param key Key value to send.
  * @returns A promise that resolves when the device accepts both key events.
  *

@@ -2,13 +2,13 @@
  * Normalized types.
  */
 export type ZoneMember = {
-    ipaddress?: string
-    macAddress?: string
+    ipaddress?: string | undefined
+    macAddress?: string | undefined
 }
 
 export type Zone = {
-    master?: string
-    member?: ZoneMember | ZoneMember[]
+    master?: string | undefined
+    member?: ZoneMember | ZoneMember[] | undefined
 }
 
 /**
@@ -19,7 +19,7 @@ export type ZoneMemberRawResponse = Omit<ZoneMember, 'macAddress'> & {
 }
 
 export type ZoneRawResponse = Omit<Zone, 'member'> & {
-    member?: ZoneMemberRawResponse | ZoneMemberRawResponse[]
+    member?: ZoneMemberRawResponse | ZoneMemberRawResponse[] | undefined
 }
 
 /**
@@ -36,13 +36,17 @@ function normalizeZoneMember(member: ZoneMemberRawResponse): ZoneMember {
  * Converts a raw XML response shape to the normalized Zone shape.
  */
 export function normalizeZone(zone?: ZoneRawResponse): Zone {
-    if (!zone) return {}
+    if (!zone) {
+        return {}
+    }
 
-    const member = Array.isArray(zone.member)
-        ? zone.member.map((item) => normalizeZoneMember(item))
-        : zone.member
-          ? normalizeZoneMember(zone.member)
-          : undefined
+    let member: ZoneMember | ZoneMember[] | undefined
+
+    if (Array.isArray(zone.member)) {
+        member = zone.member.map(normalizeZoneMember)
+    } else if (zone.member) {
+        member = normalizeZoneMember(zone.member)
+    }
 
     return {
         master: zone.master,
