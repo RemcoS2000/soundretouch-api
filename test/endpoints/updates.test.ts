@@ -13,7 +13,7 @@ import { createWsMockClient } from '../helpers/mockClient'
 
 describe('updates endpoint subscriptions', () => {
     it('subscribes to sw update status updates', () => {
-        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const { client, onMessage } = createWsMockClient()
         let messageHandler: ((update: unknown) => void) | undefined
         onMessage.mockImplementation((handler: (update: unknown) => void) => {
             messageHandler = handler
@@ -24,7 +24,6 @@ describe('updates endpoint subscriptions', () => {
         subscribeSwUpdateStatusUpdated(client, handler)
         messageHandler?.({ swUpdateStatusUpdated: {} })
 
-        expect(ensureConnected).toHaveBeenCalledTimes(1)
         expect(handler).toHaveBeenCalledTimes(1)
     })
 
@@ -111,7 +110,6 @@ describe('updates endpoint subscriptions', () => {
 
         subscribeWebSocketError(client, handler)
 
-        expect(ensureConnected).toHaveBeenCalledTimes(1)
         expect(onError).toHaveBeenCalledWith(handler)
     })
 })

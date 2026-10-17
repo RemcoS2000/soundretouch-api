@@ -65,7 +65,12 @@ describe('HttpClient', () => {
     it('throws TimeoutError when a request is aborted', async () => {
         const error = new Error('aborted')
         ;(error as Error & { name: string }).name = 'AbortError'
-        ;(globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(error)
+        ;(globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mockImplementation(
+            (_url, init) =>
+                new Promise((_resolve, reject) => {
+                    init.signal.addEventListener('abort', () => reject(error))
+                })
+        )
 
         const client = new HttpClient('device.local', { timeoutMs: 5 })
 

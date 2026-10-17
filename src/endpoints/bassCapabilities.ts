@@ -1,7 +1,7 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
-import { BassCapabilities } from '../types/BassCapabilities'
+import { type HttpClient, type RequestOptions } from '../client/http'
+import { type BassCapabilities } from '../types/BassCapabilities'
 
 const log = createDebug('soundretouch:endpoints:basscapabilities')
 
@@ -14,12 +14,15 @@ type BassCapabilitiesResponse = {
  *
  * GET /bassCapabilities
  *
+ * @param client HTTP client for the target device.
+ * @param options Optional cancellation signal for this read.
  * @returns Promise<BassCapabilities> A promise that resolves to the bass capabilities payload as returned by the device.
  */
-export async function fetchBassCapabilities(client: HttpClient): Promise<BassCapabilities> {
+export async function fetchBassCapabilities(client: HttpClient, options?: RequestOptions): Promise<BassCapabilities> {
     log('GET /bassCapabilities')
 
-    const data = await client.getXml<BassCapabilitiesResponse>('/bassCapabilities')
+    const data = await client.getXml<BassCapabilitiesResponse>('/bassCapabilities', ...(options ? [options] : []))
+
     log('response %O', data.bassCapabilities ?? {})
 
     return data.bassCapabilities ?? {}

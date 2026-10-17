@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { WebSocketClient } from '../../src/client/ws'
+import { requiredAt } from '../requiredAt'
 
 type Listener = (event: { data?: unknown }) => void
 
@@ -51,8 +52,8 @@ describe('WebSocketClient', () => {
         socket.connect()
 
         expect(MockWebSocket.instances).toHaveLength(1)
-        expect(MockWebSocket.instances[0].url).toBe('ws://device.local:8080')
-        expect(MockWebSocket.instances[0].protocols).toBe('gabbo')
+        expect(requiredAt(MockWebSocket.instances, 0).url).toBe('ws://device.local:8080')
+        expect(requiredAt(MockWebSocket.instances, 0).protocols).toBe('gabbo')
     })
 
     it('connects through a proxy when proxyUrl is provided', () => {
@@ -64,7 +65,7 @@ describe('WebSocketClient', () => {
 
         const directUrl = 'ws://device.local:8080'
         expect(MockWebSocket.instances).toHaveLength(1)
-        expect(MockWebSocket.instances[0].url).toBe(`${proxyUrl}${encodeURIComponent(directUrl)}`)
+        expect(requiredAt(MockWebSocket.instances, 0).url).toBe(`${proxyUrl}${encodeURIComponent(directUrl)}`)
     })
 
     it('reconnects when autoReconnect is enabled', () => {
@@ -76,7 +77,7 @@ describe('WebSocketClient', () => {
 
         expect(MockWebSocket.instances).toHaveLength(1)
 
-        MockWebSocket.instances[0].emit('close')
+        requiredAt(MockWebSocket.instances, 0).emit('close')
         expect(MockWebSocket.instances).toHaveLength(1)
 
         vi.advanceTimersByTime(10)
@@ -94,7 +95,7 @@ describe('WebSocketClient', () => {
 
         const xml =
             '<updates deviceID="AA:BB"><nowPlayingUpdated><nowPlaying deviceID="AA:BB" source="AUX"><ContentItem source="AUX" location="room" sourceAccount="" isPresetable="false"><itemName>Line In</itemName></ContentItem><track/><artist/><album/><stationName>Station</stationName><art artImageStatus="IMAGE_PRESENT">http://example</art><playStatus>PLAY_STATE</playStatus><description>desc</description><stationLocation>loc</stationLocation></nowPlaying></nowPlayingUpdated></updates>'
-        MockWebSocket.instances[0].emit('message', { data: xml })
+        requiredAt(MockWebSocket.instances, 0).emit('message', { data: xml })
 
         expect(handler).toHaveBeenCalledWith({
             updates: {
@@ -133,7 +134,7 @@ describe('WebSocketClient', () => {
         socket.connect()
 
         const errorEvent = { data: 'boom' }
-        MockWebSocket.instances[0].emit('error', errorEvent)
+        requiredAt(MockWebSocket.instances, 0).emit('error', errorEvent)
 
         expect(handler).toHaveBeenCalledWith(errorEvent)
     })

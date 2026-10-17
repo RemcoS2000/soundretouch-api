@@ -48,7 +48,7 @@ describe('bass endpoint', () => {
     })
 
     it('subscribes to bass websocket updates', () => {
-        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const { client, onMessage } = createWsMockClient()
         const unsubscribe = vi.fn()
         let messageHandler: ((update: unknown) => void) | undefined
 
@@ -60,7 +60,6 @@ describe('bass endpoint', () => {
         const handler = vi.fn()
         const off = subscribeBassUpdated(client, handler)
 
-        expect(ensureConnected).toHaveBeenCalledTimes(1)
         expect(onMessage).toHaveBeenCalledTimes(1)
         expect(off).toBe(unsubscribe)
 

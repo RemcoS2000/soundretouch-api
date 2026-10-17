@@ -1,9 +1,9 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
-import { WebSocketClient } from '../client/ws'
-import { DeviceInfo } from '../types/DeviceInfo'
-import { Updates } from '../types/Updates'
+import { type HttpClient, type RequestOptions } from '../client/http'
+import { type WebSocketClient } from '../client/ws'
+import { type DeviceInfo } from '../types/DeviceInfo'
+import { type Updates } from '../types/Updates'
 
 const log = createDebug('soundretouch:endpoints:info')
 
@@ -16,12 +16,15 @@ type InfoResponse = {
  *
  * GET /info
  *
+ * @param client HTTP client for the target device.
+ * @param options Optional cancellation signal for this read.
  * @returns Promise<DeviceInfo> A promise that resolves to the device info payload as returned by the device.
  */
-export async function fetchInfo(client: HttpClient): Promise<DeviceInfo> {
+export async function fetchInfo(client: HttpClient, options?: RequestOptions): Promise<DeviceInfo> {
     log('GET /info')
 
-    const data = await client.getXml<InfoResponse>('/info')
+    const data = await client.getXml<InfoResponse>('/info', ...(options ? [options] : []))
+
     log('response %O', data.info ?? {})
 
     return data.info ?? {}
@@ -35,8 +38,6 @@ export async function fetchInfo(client: HttpClient): Promise<DeviceInfo> {
  * @returns Unsubscribe function.
  */
 export function subscribeInfoUpdated(wsClient: WebSocketClient, handler: () => void): () => void {
-    wsClient.ensureConnected()
-
     return wsClient.onMessage<Updates>((update) => {
         if (update.infoUpdated) {
             handler()

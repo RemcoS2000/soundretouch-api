@@ -1,7 +1,7 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
-import { AudioDspControls } from '../types/AudioDspControls'
+import { type HttpClient, type RequestOptions } from '../client/http'
+import { type AudioDspControls } from '../types/AudioDspControls'
 
 const log = createDebug('soundretouch:endpoints:audiodspcontrols')
 
@@ -9,6 +9,9 @@ type AudioDspControlsResponse = {
     audiodspcontrols?: AudioDspControls
 }
 
+/**
+ * Serializes only the DSP settings supplied by the caller.
+ */
 function buildAudioDspControlsXml(values: AudioDspControls): string {
     const parts: string[] = []
 
@@ -28,12 +31,15 @@ function buildAudioDspControlsXml(values: AudioDspControls): string {
  *
  * GET /audiodspcontrols
  *
+ * @param client HTTP client for the target device.
+ * @param options Optional cancellation signal for this read.
  * @returns Promise<AudioDspControls> A promise that resolves to the DSP controls payload as returned by the device.
  */
-export async function fetchAudioDspControls(client: HttpClient): Promise<AudioDspControls> {
+export async function fetchAudioDspControls(client: HttpClient, options?: RequestOptions): Promise<AudioDspControls> {
     log('GET /audiodspcontrols')
 
-    const data = await client.getXml<AudioDspControlsResponse>('/audiodspcontrols')
+    const data = await client.getXml<AudioDspControlsResponse>('/audiodspcontrols', ...(options ? [options] : []))
+
     log('response %O', data.audiodspcontrols ?? {})
 
     return data.audiodspcontrols ?? {}
@@ -44,6 +50,7 @@ export async function fetchAudioDspControls(client: HttpClient): Promise<AudioDs
  *
  * POST /audiodspcontrols
  *
+ * @param client HTTP client for the target device.
  * @param values DSP values to update (audiomode and/or videosyncaudiodelay).
  * @returns A promise that resolves when the device accepts the DSP update.
  *
@@ -56,6 +63,5 @@ export async function setAudioDspControls(client: HttpClient, values: AudioDspCo
 
     log('POST /audiodspcontrols')
     log('payload %s', body)
-
     await client.post('/audiodspcontrols', body)
 }

@@ -21,3 +21,6 @@ export type { HttpClientOptions } from './src/client/http'
 export type { WebSocketClientOptions } from './src/client/ws'
 export type { SoundTouchDeviceOptions } from './src/device/SoundTouchDevice'
 export { SoundTouchError, HttpError, TimeoutError } from './src/client/errors'
+
+export type { RequestOptions } from './src/client/http'
+export type { TransportState } from './src/client/ws'

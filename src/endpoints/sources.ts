@@ -1,9 +1,9 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
-import { WebSocketClient } from '../client/ws'
-import { normalizeSources, Sources, SourcesRawResponse } from '../types/Sources'
-import { Updates } from '../types/Updates'
+import { type HttpClient, type RequestOptions } from '../client/http'
+import { type WebSocketClient } from '../client/ws'
+import { normalizeSources, type Sources, type SourcesRawResponse } from '../types/Sources'
+import { type Updates } from '../types/Updates'
 
 const log = createDebug('soundretouch:endpoints:sources')
 
@@ -16,12 +16,14 @@ type SourcesResponse = {
  *
  * GET /sources
  *
+ * @param client HTTP client for the target device.
+ * @param options Optional cancellation signal for this read.
  * @returns Promise<Sources> A promise that resolves to the sources payload as returned by the device.
  */
-export async function fetchSources(client: HttpClient): Promise<Sources> {
+export async function fetchSources(client: HttpClient, options?: RequestOptions): Promise<Sources> {
     log('GET /sources')
 
-    const data = await client.getXml<SourcesResponse>('/sources')
+    const data = await client.getXml<SourcesResponse>('/sources', ...(options ? [options] : []))
     const sources = normalizeSources(data.sources)
 
     log('response %O', sources)
@@ -37,8 +39,6 @@ export async function fetchSources(client: HttpClient): Promise<Sources> {
  * @returns Unsubscribe function.
  */
 export function subscribeSourcesUpdated(wsClient: WebSocketClient, handler: () => void): () => void {
-    wsClient.ensureConnected()
-
     return wsClient.onMessage<Updates>((update) => {
         if (update.sourcesUpdated) {
             handler()

@@ -1,6 +1,6 @@
-import { WebSocketClient } from '../client/ws'
-import { Recents } from '../types/Recents'
-import { Updates } from '../types/Updates'
+import { type WebSocketClient } from '../client/ws'
+import { type Recents } from '../types/Recents'
+import { type Updates } from '../types/Updates'
 
 /**
  * Subscribes to software update status notifications from the websocket connection.
@@ -10,8 +10,6 @@ import { Updates } from '../types/Updates'
  * @returns Unsubscribe function.
  */
 export function subscribeSwUpdateStatusUpdated(wsClient: WebSocketClient, handler: () => void): () => void {
-    wsClient.ensureConnected()
-
     return wsClient.onMessage<Updates>((update) => {
         if (update.swUpdateStatusUpdated) {
             handler()
@@ -27,8 +25,6 @@ export function subscribeSwUpdateStatusUpdated(wsClient: WebSocketClient, handle
  * @returns Unsubscribe function.
  */
 export function subscribeSiteSurveyResultsUpdated(wsClient: WebSocketClient, handler: () => void): () => void {
-    wsClient.ensureConnected()
-
     return wsClient.onMessage<Updates>((update) => {
         if (update.siteSurveyResultsUpdated) {
             handler()
@@ -44,8 +40,6 @@ export function subscribeSiteSurveyResultsUpdated(wsClient: WebSocketClient, han
  * @returns Unsubscribe function.
  */
 export function subscribeConnectionStateUpdated(wsClient: WebSocketClient, handler: () => void): () => void {
-    wsClient.ensureConnected()
-
     return wsClient.onMessage<Updates>((update) => {
         if (update.connectionStateUpdated) {
             handler()
@@ -61,8 +55,6 @@ export function subscribeConnectionStateUpdated(wsClient: WebSocketClient, handl
  * @returns Unsubscribe function.
  */
 export function subscribeAcctModeUpdated(wsClient: WebSocketClient, handler: () => void): () => void {
-    wsClient.ensureConnected()
-
     return wsClient.onMessage<Updates>((update) => {
         if (update.acctModeUpdated) {
             handler()
@@ -78,8 +70,6 @@ export function subscribeAcctModeUpdated(wsClient: WebSocketClient, handler: () 
  * @returns Unsubscribe function.
  */
 export function subscribeErrorNotification(wsClient: WebSocketClient, handler: (error: Record<string, unknown>) => void): () => void {
-    wsClient.ensureConnected()
-
     return wsClient.onMessage<Updates>((update) => {
         if (update.errorNotification) {
             handler(update.errorNotification)
@@ -95,12 +85,12 @@ export function subscribeErrorNotification(wsClient: WebSocketClient, handler: (
  * @returns Unsubscribe function.
  */
 export function subscribeRecentsUpdated(wsClient: WebSocketClient, handler: (recents: Recents) => void): () => void {
-    wsClient.ensureConnected()
-
     return wsClient.onMessage<Updates>((update) => {
         const recent = update.recentsUpdated?.recents?.recent
+
         if (Array.isArray(recent)) {
             handler(recent)
+
             return
         }
 
@@ -118,7 +108,9 @@ export function subscribeRecentsUpdated(wsClient: WebSocketClient, handler: (rec
  * @returns Unsubscribe function.
  */
 export function subscribeWebSocketError(wsClient: WebSocketClient, handler: (error: unknown) => void): () => void {
+    const off = wsClient.onError(handler)
+
     wsClient.ensureConnected()
 
-    return wsClient.onError(handler)
+    return off
 }

@@ -1,9 +1,9 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
-import { WebSocketClient } from '../client/ws'
-import { Updates } from '../types/Updates'
-import { Volume } from '../types/Volume'
+import { type HttpClient, type RequestOptions } from '../client/http'
+import { type WebSocketClient } from '../client/ws'
+import { type Updates } from '../types/Updates'
+import { type Volume } from '../types/Volume'
 
 const log = createDebug('soundretouch:endpoints:volume')
 
@@ -11,10 +11,20 @@ type VolumeResponse = {
     volume?: Volume
 }
 
-export async function fetchVolume(client: HttpClient): Promise<Volume> {
+/**
+ * Gets the current volume and mute state from the device.
+ *
+ * GET /volume
+ *
+ * @param client HTTP client for the target device.
+ * @param options Optional cancellation signal for this read.
+ * @returns A promise that resolves to the volume payload as returned by the device.
+ */
+export async function fetchVolume(client: HttpClient, options?: RequestOptions): Promise<Volume> {
     log('GET /volume')
 
-    const data = await client.getXml<VolumeResponse>('/volume')
+    const data = await client.getXml<VolumeResponse>('/volume', ...(options ? [options] : []))
+
     log('response %O', data.volume ?? {})
 
     return data.volume ?? {}
@@ -28,6 +38,7 @@ export async function fetchVolume(client: HttpClient): Promise<Volume> {
  * The muteenabled setting is applied first, if present. The system will be unmuted if the
  * volume value is larger than the current volume setting.
  *
+ * @param client HTTP client for the target device.
  * @param value Volume value to set.
  * @param muteenabled Optional mute state to set before applying the volume value.
  * @returns A promise that resolves when the device accepts the volume value.
@@ -55,10 +66,9 @@ export async function setVolume(client: HttpClient, value: number, muteenabled?:
  * @returns Unsubscribe function.
  */
 export function subscribeVolume(wsClient: WebSocketClient, handler: (volume: Volume) => void): () => void {
-    wsClient.ensureConnected()
-
     return wsClient.onMessage<Updates>((update) => {
         const volumeUpdated = update.volumeUpdated
+
         if (!volumeUpdated) {
             return
         }

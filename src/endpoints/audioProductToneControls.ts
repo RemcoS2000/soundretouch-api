@@ -1,7 +1,7 @@
 import createDebug from 'debug'
 
-import { HttpClient } from '../client/http'
-import { AudioProductToneControls, AudioProductToneControlsUpdate } from '../types/AudioProductToneControls'
+import { type HttpClient, type RequestOptions } from '../client/http'
+import { type AudioProductToneControls, type AudioProductToneControlsUpdate } from '../types/AudioProductToneControls'
 
 const log = createDebug('soundretouch:endpoints:audioproducttonecontrols')
 
@@ -9,6 +9,9 @@ type AudioProductToneControlsResponse = {
     audioproducttonecontrols?: AudioProductToneControls
 }
 
+/**
+ * Serializes supplied bass and treble settings into the endpoint XML payload.
+ */
 function buildAudioProductToneControlsXml(values: AudioProductToneControlsUpdate): string {
     const parts: string[] = []
 
@@ -28,12 +31,15 @@ function buildAudioProductToneControlsXml(values: AudioProductToneControlsUpdate
  *
  * GET /audioproducttonecontrols
  *
+ * @param client HTTP client for the target device.
+ * @param options Optional cancellation signal for this read.
  * @returns Promise<AudioProductToneControls> A promise that resolves to the tone controls payload as returned by the device.
  */
-export async function fetchAudioProductToneControls(client: HttpClient): Promise<AudioProductToneControls> {
+export async function fetchAudioProductToneControls(client: HttpClient, options?: RequestOptions): Promise<AudioProductToneControls> {
     log('GET /audioproducttonecontrols')
 
-    const data = await client.getXml<AudioProductToneControlsResponse>('/audioproducttonecontrols')
+    const data = await client.getXml<AudioProductToneControlsResponse>('/audioproducttonecontrols', ...(options ? [options] : []))
+
     log('response %O', data.audioproducttonecontrols ?? {})
 
     return data.audioproducttonecontrols ?? {}
@@ -44,6 +50,7 @@ export async function fetchAudioProductToneControls(client: HttpClient): Promise
  *
  * POST /audioproducttonecontrols
  *
+ * @param client HTTP client for the target device.
  * @param values Tone values to update (bass and/or treble).
  * @returns A promise that resolves when the device accepts the tone update.
  *
@@ -56,6 +63,5 @@ export async function setAudioProductToneControls(client: HttpClient, values: Au
 
     log('POST /audioproducttonecontrols')
     log('payload %s', body)
-
     await client.post('/audioproducttonecontrols', body)
 }

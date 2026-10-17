@@ -50,7 +50,7 @@ describe('presets endpoint', () => {
     })
 
     it('subscribes to now selection websocket updates', () => {
-        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const { client, onMessage } = createWsMockClient()
         const unsubscribe = vi.fn()
         let messageHandler: ((update: unknown) => void) | undefined
 
@@ -62,7 +62,6 @@ describe('presets endpoint', () => {
         const handler = vi.fn()
         const off = subscribeNowSelectionUpdated(client, handler)
 
-        expect(ensureConnected).toHaveBeenCalledTimes(1)
         expect(onMessage).toHaveBeenCalledTimes(1)
         expect(off).toBe(unsubscribe)
 
@@ -71,7 +70,7 @@ describe('presets endpoint', () => {
     })
 
     it('subscribes to presets websocket updates and normalizes id', () => {
-        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const { client, onMessage } = createWsMockClient()
         let messageHandler: ((update: unknown) => void) | undefined
 
         onMessage.mockImplementation((handler: (update: unknown) => void) => {
@@ -82,7 +81,6 @@ describe('presets endpoint', () => {
         const handler = vi.fn()
         subscribePresetsUpdated(client, handler)
 
-        expect(ensureConnected).toHaveBeenCalledTimes(1)
         expect(onMessage).toHaveBeenCalledTimes(1)
 
         messageHandler?.({ presetsUpdated: { presets: { preset: [{ id: '2', name: 'Preset 2' }] } } })

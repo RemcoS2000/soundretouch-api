@@ -32,7 +32,7 @@ describe('info endpoint', () => {
     })
 
     it('subscribes to info websocket updates', () => {
-        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const { client, onMessage } = createWsMockClient()
         const unsubscribe = vi.fn()
         let messageHandler: ((update: unknown) => void) | undefined
 
@@ -44,7 +44,6 @@ describe('info endpoint', () => {
         const handler = vi.fn()
         const off = subscribeInfoUpdated(client, handler)
 
-        expect(ensureConnected).toHaveBeenCalledTimes(1)
         expect(onMessage).toHaveBeenCalledTimes(1)
         expect(off).toBe(unsubscribe)
 

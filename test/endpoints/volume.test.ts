@@ -56,7 +56,7 @@ describe('volume endpoint', () => {
     })
 
     it('subscribes to volume websocket updates', () => {
-        const { client, ensureConnected, onMessage } = createWsMockClient()
+        const { client, onMessage } = createWsMockClient()
         const unsubscribe = vi.fn()
         let messageHandler: ((update: unknown) => void) | undefined
 
@@ -68,7 +68,6 @@ describe('volume endpoint', () => {
         const handler = vi.fn()
         const off = subscribeVolume(client, handler)
 
-        expect(ensureConnected).toHaveBeenCalledTimes(1)
         expect(onMessage).toHaveBeenCalledTimes(1)
         expect(off).toBe(unsubscribe)
 

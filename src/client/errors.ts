@@ -2,6 +2,9 @@
  * Base error type for SoundTouch client operations.
  */
 export class SoundTouchError extends Error {
+    /**
+     * Creates a named error for SoundTouch client failures.
+     */
     constructor(message: string) {
         super(message)
         this.name = 'SoundTouchError'
@@ -14,7 +17,7 @@ export class SoundTouchError extends Error {
 export class HttpError extends SoundTouchError {
     status: number
     statusText: string
-    body?: string
+    body: string | undefined
 
     /**
      * Creates a new HttpError instance.

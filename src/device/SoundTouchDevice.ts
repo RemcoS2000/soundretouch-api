@@ -1,15 +1,14 @@
-﻿import { HttpClient, HttpClientOptions } from '../client/http'
-import { WebSocketClient, WebSocketClientOptions } from '../client/ws'
+﻿import { HttpClient, type HttpClientOptions, type RequestOptions } from '../client/http'
+import { type TransportState, WebSocketClient, type WebSocketClientOptions } from '../client/ws'
 import { fetchAudioDspControls, setAudioDspControls } from '../endpoints/audiodspcontrols'
 import { fetchAudioProductLevelControls, setAudioProductLevelControls } from '../endpoints/audioProductLevelControls'
 import { fetchAudioProductToneControls, setAudioProductToneControls } from '../endpoints/audioProductToneControls'
 import { playStreamUrl } from '../endpoints/avTransport'
-import { fetchBass, setBass } from '../endpoints/bass'
-import { subscribeBassUpdated } from '../endpoints/bass'
+import { fetchBass, setBass, subscribeBassUpdated } from '../endpoints/bass'
 import { fetchBassCapabilities } from '../endpoints/bassCapabilities'
 import { fetchCapabilities } from '../endpoints/capabilities'
 import { fetchInfo, subscribeInfoUpdated } from '../endpoints/info'
-import { sendKeyPress, sendKeyPressAndRelease, SoundTouchKey } from '../endpoints/key'
+import { sendKeyPress, sendKeyPressAndRelease, type SoundTouchKey } from '../endpoints/key'
 import { setName } from '../endpoints/name'
 import { fetchNowPlaying, subscribeNowPlaying } from '../endpoints/nowPlaying'
 import { fetchPresets, subscribeNowSelectionUpdated, subscribePresetsUpdated } from '../endpoints/presets'
@@ -28,22 +27,22 @@ import {
 import { setUserTrackControl } from '../endpoints/userTrackControl'
 import { fetchVolume, setVolume, subscribeVolume } from '../endpoints/volume'
 import { addZoneSlave, fetchZone, removeZoneSlave, setZone, subscribeZoneUpdated } from '../endpoints/zone'
-import { AudioDspControls } from '../types/AudioDspControls'
-import { AudioProductLevelControls, AudioProductLevelControlsUpdate } from '../types/AudioProductLevelControls'
-import { AudioProductToneControls, AudioProductToneControlsUpdate } from '../types/AudioProductToneControls'
-import { AvTransportResponse } from '../types/AvTransport'
-import { Bass } from '../types/Bass'
-import { BassCapabilities } from '../types/BassCapabilities'
-import { Capabilities } from '../types/Capabilities'
-import { ContentItem } from '../types/ContentItem'
-import { DeviceInfo } from '../types/DeviceInfo'
-import { UserTrackControlTypes } from '../types/Enums'
-import { NowPlaying } from '../types/NowPlaying'
-import { Preset, Presets } from '../types/Presets'
-import { Recents } from '../types/Recents'
-import { Sources } from '../types/Sources'
-import { Volume } from '../types/Volume'
-import { Zone, ZoneConfig, ZoneSlaveConfig } from '../types/Zone'
+import { type AudioDspControls } from '../types/AudioDspControls'
+import { type AudioProductLevelControls, type AudioProductLevelControlsUpdate } from '../types/AudioProductLevelControls'
+import { type AudioProductToneControls, type AudioProductToneControlsUpdate } from '../types/AudioProductToneControls'
+import { type AvTransportResponse } from '../types/AvTransport'
+import { type Bass } from '../types/Bass'
+import { type BassCapabilities } from '../types/BassCapabilities'
+import { type Capabilities } from '../types/Capabilities'
+import { type ContentItem } from '../types/ContentItem'
+import { type DeviceInfo } from '../types/DeviceInfo'
+import { type UserTrackControlTypes } from '../types/Enums'
+import { type NowPlaying } from '../types/NowPlaying'
+import { type Preset, type Presets } from '../types/Presets'
+import { type Recents } from '../types/Recents'
+import { type Sources } from '../types/Sources'
+import { type Volume } from '../types/Volume'
+import { type Zone, type ZoneConfig, type ZoneSlaveConfig } from '../types/Zone'
 
 export type SoundTouchDeviceOptions = {
     http?: HttpClientOptions
@@ -67,6 +66,9 @@ export class SoundTouchDevice {
     private avTransportClient: HttpClient
     private wsClient: WebSocketClient
 
+    /**
+     * Initializes the device transports without opening a live-update connection.
+     */
     constructor(host: string, options: SoundTouchDeviceOptions = {}) {
         this.host = host
         this.httpClient = new HttpClient(host, { ...options.http, port: 8090 })
@@ -75,14 +77,48 @@ export class SoundTouchDevice {
     }
 
     /**
+     * Opens live updates; subscriptions also connect automatically.
+     */
+    connect(): void {
+        this.wsClient.connect()
+    }
+
+    /**
+     * Stops live updates and reconnect; this device can be connected again.
+     */
+    disconnect(): void {
+        this.wsClient.close()
+    }
+
+    /**
+     * Permanently releases transports, requests, listeners and timers.
+     */
+    dispose(): void {
+        this.wsClient.dispose()
+        this.httpClient.dispose()
+        this.avTransportClient.dispose()
+    }
+
+    /**
+     * Observes transport state without opening a connection.
+     *
+     * @param handler Callback invoked immediately and whenever the transport state changes.
+     * @returns A function that removes the state handler.
+     */
+    onTransportStateChanged(handler: (state: TransportState) => void): () => void {
+        return this.wsClient.onStateChanged(handler)
+    }
+
+    /**
      * Gets device information including identifiers, components, and network info.
      *
      * GET /info
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<DeviceInfo> A promise that resolves to the device info payload as returned by the device.
      */
-    info(): Promise<DeviceInfo> {
-        return fetchInfo(this.httpClient)
+    info(options?: RequestOptions): Promise<DeviceInfo> {
+        return fetchInfo(this.httpClient, options)
     }
 
     /**
@@ -90,10 +126,11 @@ export class SoundTouchDevice {
      *
      * GET /now_playing
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<NowPlaying> A promise that resolves to the now playing payload as returned by the device.
      */
-    nowPlaying(): Promise<NowPlaying> {
-        return fetchNowPlaying(this.httpClient)
+    nowPlaying(options?: RequestOptions): Promise<NowPlaying> {
+        return fetchNowPlaying(this.httpClient, options)
     }
 
     /**
@@ -101,10 +138,11 @@ export class SoundTouchDevice {
      *
      * GET /trackInfo
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<NowPlaying> A promise that resolves to the now playing payload as returned by the device.
      */
-    trackInfo(): Promise<NowPlaying> {
-        return fetchTrackInfo(this.httpClient)
+    trackInfo(options?: RequestOptions): Promise<NowPlaying> {
+        return fetchTrackInfo(this.httpClient, options)
     }
 
     /**
@@ -112,10 +150,11 @@ export class SoundTouchDevice {
      *
      * GET /sources
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<Sources> A promise that resolves to the sources payload as returned by the device.
      */
-    sources(): Promise<Sources> {
-        return fetchSources(this.httpClient)
+    sources(options?: RequestOptions): Promise<Sources> {
+        return fetchSources(this.httpClient, options)
     }
 
     /**
@@ -156,10 +195,11 @@ export class SoundTouchDevice {
      *
      * GET /volume
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<Volume> A promise that resolves to the volume payload as returned by the device.
      */
-    volume(): Promise<Volume> {
-        return fetchVolume(this.httpClient)
+    volume(options?: RequestOptions): Promise<Volume> {
+        return fetchVolume(this.httpClient, options)
     }
 
     /**
@@ -167,10 +207,11 @@ export class SoundTouchDevice {
      *
      * GET /bass
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<Bass> A promise that resolves to the bass payload as returned by the device.
      */
-    bass(): Promise<Bass> {
-        return fetchBass(this.httpClient)
+    bass(options?: RequestOptions): Promise<Bass> {
+        return fetchBass(this.httpClient, options)
     }
 
     /**
@@ -178,10 +219,11 @@ export class SoundTouchDevice {
      *
      * GET /bassCapabilities
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<BassCapabilities> A promise that resolves to the bass capabilities payload as returned by the device.
      */
-    bassCapabilities(): Promise<BassCapabilities> {
-        return fetchBassCapabilities(this.httpClient)
+    bassCapabilities(options?: RequestOptions): Promise<BassCapabilities> {
+        return fetchBassCapabilities(this.httpClient, options)
     }
 
     /**
@@ -189,10 +231,11 @@ export class SoundTouchDevice {
      *
      * GET /capabilities
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<Capabilities> A promise that resolves to the capabilities payload as returned by the device.
      */
-    capabilities(): Promise<Capabilities> {
-        return fetchCapabilities(this.httpClient)
+    capabilities(options?: RequestOptions): Promise<Capabilities> {
+        return fetchCapabilities(this.httpClient, options)
     }
 
     /**
@@ -200,10 +243,11 @@ export class SoundTouchDevice {
      *
      * GET /audiodspcontrols
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<AudioDspControls> A promise that resolves to the DSP controls payload as returned by the device.
      */
-    audioDspControls(): Promise<AudioDspControls> {
-        return fetchAudioDspControls(this.httpClient)
+    audioDspControls(options?: RequestOptions): Promise<AudioDspControls> {
+        return fetchAudioDspControls(this.httpClient, options)
     }
 
     /**
@@ -211,10 +255,11 @@ export class SoundTouchDevice {
      *
      * GET /audioproducttonecontrols
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<AudioProductToneControls> A promise that resolves to the tone controls payload as returned by the device.
      */
-    audioProductToneControls(): Promise<AudioProductToneControls> {
-        return fetchAudioProductToneControls(this.httpClient)
+    audioProductToneControls(options?: RequestOptions): Promise<AudioProductToneControls> {
+        return fetchAudioProductToneControls(this.httpClient, options)
     }
 
     /**
@@ -238,10 +283,11 @@ export class SoundTouchDevice {
      *
      * GET /audioproductlevelcontrols
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<AudioProductLevelControls> A promise that resolves to the level controls payload as returned by the device.
      */
-    audioProductLevelControls(): Promise<AudioProductLevelControls> {
-        return fetchAudioProductLevelControls(this.httpClient)
+    audioProductLevelControls(options?: RequestOptions): Promise<AudioProductLevelControls> {
+        return fetchAudioProductLevelControls(this.httpClient, options)
     }
 
     /**
@@ -281,10 +327,11 @@ export class SoundTouchDevice {
      *
      * GET /presets
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<Presets> A promise that resolves to the presets payload as returned by the device.
      */
-    presets(): Promise<Presets> {
-        return fetchPresets(this.httpClient)
+    presets(options?: RequestOptions): Promise<Presets> {
+        return fetchPresets(this.httpClient, options)
     }
 
     /**
@@ -339,10 +386,11 @@ export class SoundTouchDevice {
      *
      * GET /getZone
      *
+     * @param options Optional cancellation signal for this read.
      * @returns Promise<Zone> A promise that resolves to the zone payload as returned by the device.
      */
-    zone(): Promise<Zone> {
-        return fetchZone(this.httpClient)
+    zone(options?: RequestOptions): Promise<Zone> {
+        return fetchZone(this.httpClient, options)
     }
 
     /**
@@ -392,7 +440,6 @@ export class SoundTouchDevice {
      *
      * @param key Key value to send.
      * @param state Key state to send: "press" or "release".
-     * @param sender Sender label to include in the request.
      * @returns A promise that resolves when the device accepts the key event.
      *
      * @example
@@ -409,7 +456,6 @@ export class SoundTouchDevice {
      * POST /key
      *
      * @param key Key value to send.
-     * @param sender Sender label to include in the request.
      * @returns A promise that resolves when the device accepts both key events.
      *
      * @example
