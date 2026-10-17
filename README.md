@@ -126,3 +126,30 @@ npx tsx scripts/smoke.ts
 ## Compliance Notice
 
 Trademark attribution: Bose and SoundTouch are trademarks of Bose Corporation.
+
+## Device lifecycle and cancellation (1.6)
+
+Use a single `SoundTouchDevice` object for all interaction with each speaker. Subscriptions connect automatically; explicit lifecycle methods are available for application foreground/background handling. No additional manager or session object is required.
+
+```ts
+const device = new SoundTouchDevice('192.168.1.12', {
+    http: { timeoutMs: 8000 },
+    ws: { autoReconnect: true, maxReconnectDelayMs: 30000 },
+})
+const offState = device.onTransportStateChanged((state) => console.log(state))
+const offPlaying = device.onNowPlayingUpdated((playing) => console.log(playing))
+const controller = new AbortController()
+const info = await device.info({ signal: controller.signal })
+await device.setVolume(25)
+device.disconnect() // Stops reconnect, retains listeners, permits later reuse.
+device.connect()
+offPlaying()
+offState()
+device.dispose() // Permanent: closes sockets, cancels requests, releases listeners/timers.
+```
+
+Transport states are `connecting`, `open`, `reconnecting`, `disconnected`, and `disposed`. State observation itself does not open a socket. Reconnection is opt-in and uses exponential backoff with jitter capped at 30 seconds. Read methods accept an optional `{ signal }`; caller cancellation remains an AbortError rather than becoming a timeout. The device object owns both transports. Application caches, persistence, navigation, and group orchestration remain the caller’s responsibility.
+
+## Quality tooling
+
+Run `npm run verify` for the enforced checks.
